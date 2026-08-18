@@ -1,0 +1,11 @@
+{
+  "authority_cut_decisions": 3,
+  "irreversible_effects_executed_without_funds_release": 0,
+  "per_tool_hitl_prompts": 7,
+  "prompt_reduction_fraction": 0.5714285714285714,
+  "protected_tool_effects": 7,
+  "reversible_effects_executed_before_correction": 6,
+  "reversible_effects_rolled_back_after_correction": 6,
+  "safe_actions_before_human": 5,
+  "unaffected_safe_actions_preserved": 5
+}

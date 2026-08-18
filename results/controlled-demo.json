@@ -1,0 +1,16 @@
+{
+  "initial_decision_surface": [
+    {"bundle_id":"vendor-risk","question":"Approve the reviewed vendor identity/tax exception and new bank account?","grants":["bank_change","vendor_exception"],"evidence":["tax-check-42","bank-check-42"],"prereqs":["tax_check","bank_check"],"ready":true},
+    {"bundle_id":"payment-release","question":"Enable the vendor payment profile and terms?","grants":["payment_enable"],"evidence":["draft-vendor-record","bank-check-42"],"prereqs":["activate"],"ready":false},
+    {"bundle_id":"first-funds","question":"Release the first irreversible payment transmission?","grants":["funds_release"],"evidence":["payment-profile-42","remittance-preview-42"],"prereqs":["remittance"],"ready":false}
+  ],
+  "after_vendor_decision_surface": [
+    {"bundle_id":"payment-release","question":"Enable the vendor payment profile and terms?","grants":["payment_enable"],"evidence":["draft-vendor-record","bank-check-42"],"prereqs":["activate"],"ready":true},
+    {"bundle_id":"first-funds","question":"Release the first irreversible payment transmission?","grants":["funds_release"],"evidence":["payment-profile-42","remittance-preview-42"],"prereqs":["remittance"],"ready":false}
+  ],
+  "before_correction":{"collect":"EXECUTED","tax_check":"EXECUTED","bank_check":"EXECUTED","draft":"EXECUTED","followup":"EXECUTED","activate":"EXECUTED","erp_sync":"EXECUTED","purchasing":"EXECUTED","payments":"EXECUTED","terms":"EXECUTED","remittance":"EXECUTED","transmit":"BLOCKED"},
+  "affected_by_correction":["activate","erp_sync","payments","purchasing","remittance","terms","transmit"],
+  "after_correction":{"collect":"EXECUTED","tax_check":"EXECUTED","bank_check":"EXECUTED","draft":"EXECUTED","followup":"EXECUTED","activate":"ROLLED_BACK","erp_sync":"ROLLED_BACK","purchasing":"ROLLED_BACK","payments":"ROLLED_BACK","terms":"ROLLED_BACK","remittance":"ROLLED_BACK","transmit":"INVALIDATED"},
+  "irreversible_transmission_executed":false,
+  "receipts":[]
+}

@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "authority-cut-agent"
+version = "0.1.0"
+description = "Strands-oriented professional agent with compressed human authority cut sets and reversible execution."
+requires-python = ">=3.11"
+license = {text = "Apache-2.0"}
+dependencies = ["fastapi>=0.110", "uvicorn>=0.27"]
+
+[project.optional-dependencies]
+aws = ["strands-agents"]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+pythonpath=["src"]
+testpaths=["tests"]
+addopts="-q"

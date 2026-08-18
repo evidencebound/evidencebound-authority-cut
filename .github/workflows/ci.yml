@@ -1,0 +1,27 @@
+name: ci
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  deterministic-kernel:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install -e '.[dev]'
+      - run: python -m pytest -q
+      - run: python -m compileall -q src tests scripts
+  strands-import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e '.[aws,dev]'
+      - run: python -c "from authority_cut.strands_app import STRANDS_TOOL_NAMES, build_agent; a=build_agent(); print(STRANDS_TOOL_NAMES); assert not any(x in STRANDS_TOOL_NAMES for x in ('apply_human_decision','revoke_human_decision'))"

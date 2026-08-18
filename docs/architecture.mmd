@@ -1,0 +1,18 @@
+flowchart TD
+    G[Professional goal] --> S[Strands Agent]
+    S --> T1[execute_safe_vendor_work]
+    S --> T2[get_authority_cut]
+    S --> T3[execute_authorized_vendor_work]
+    T1 --> C[Shared ControlPlane]
+    T2 --> C
+    T3 --> C
+    H[External Human Principal] --> API[Authority API: approve / deny / revoke]
+    API --> C
+    C --> DAG[Action DAG + semantic authority atoms]
+    DAG --> CUT[Exact minimum Authority Cut over policy bundles]
+    CUT --> B[Protected-action gate]
+    B --> X[Tool effects + receipts]
+    API -->|correction| INV[Descendant invalidation]
+    INV --> COMP[Compensate executed reversible effects]
+    COMP --> B
+    B --> IRR[Irreversible first-funds remains separately gated]
