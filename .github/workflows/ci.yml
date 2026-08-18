@@ -16,7 +16,7 @@ jobs:
       - run: python -m pip install -e '.[dev]'
       - run: python -m pytest -q
       - run: python -m compileall -q src tests scripts
-  strands-import:
+  strands-runtime-proof:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,4 +24,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install -e '.[aws,dev]'
-      - run: python -c "from authority_cut.strands_app import STRANDS_TOOL_NAMES, build_agent; a=build_agent(); print(STRANDS_TOOL_NAMES); assert not any(x in STRANDS_TOOL_NAMES for x in ('apply_human_decision','revoke_human_decision'))"
+      - name: Construct published Strands Agent
+        run: python -c "from authority_cut.strands_app import STRANDS_TOOL_NAMES, build_agent; a=build_agent(); print(STRANDS_TOOL_NAMES); assert not any(x in STRANDS_TOOL_NAMES for x in ('apply_human_decision','revoke_human_decision'))"
+      - name: Execute real Strands Agent loop with deterministic model provider
+        run: python scripts/run_strands_ci_probe.py

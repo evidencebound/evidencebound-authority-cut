@@ -1,16 +1,244 @@
 {
   "initial_decision_surface": [
-    {"bundle_id":"vendor-risk","question":"Approve the reviewed vendor identity/tax exception and new bank account?","grants":["bank_change","vendor_exception"],"evidence":["tax-check-42","bank-check-42"],"prereqs":["tax_check","bank_check"],"ready":true},
-    {"bundle_id":"payment-release","question":"Enable the vendor payment profile and terms?","grants":["payment_enable"],"evidence":["draft-vendor-record","bank-check-42"],"prereqs":["activate"],"ready":false},
-    {"bundle_id":"first-funds","question":"Release the first irreversible payment transmission?","grants":["funds_release"],"evidence":["payment-profile-42","remittance-preview-42"],"prereqs":["remittance"],"ready":false}
+    {
+      "bundle_id": "vendor-risk",
+      "question": "Approve the reviewed vendor identity/tax exception and new bank account?",
+      "grants": [
+        "bank_change",
+        "vendor_exception"
+      ],
+      "evidence": [
+        "tax-check-42",
+        "bank-check-42"
+      ],
+      "prereqs": [
+        "tax_check",
+        "bank_check"
+      ],
+      "ready": true
+    },
+    {
+      "bundle_id": "payment-release",
+      "question": "Enable the vendor payment profile and terms?",
+      "grants": [
+        "payment_enable"
+      ],
+      "evidence": [
+        "draft-vendor-record",
+        "bank-check-42"
+      ],
+      "prereqs": [
+        "activate"
+      ],
+      "ready": false
+    },
+    {
+      "bundle_id": "first-funds",
+      "question": "Release the first irreversible payment transmission?",
+      "grants": [
+        "funds_release"
+      ],
+      "evidence": [
+        "payment-profile-42",
+        "remittance-preview-42"
+      ],
+      "prereqs": [
+        "remittance"
+      ],
+      "ready": false
+    }
   ],
   "after_vendor_decision_surface": [
-    {"bundle_id":"payment-release","question":"Enable the vendor payment profile and terms?","grants":["payment_enable"],"evidence":["draft-vendor-record","bank-check-42"],"prereqs":["activate"],"ready":true},
-    {"bundle_id":"first-funds","question":"Release the first irreversible payment transmission?","grants":["funds_release"],"evidence":["payment-profile-42","remittance-preview-42"],"prereqs":["remittance"],"ready":false}
+    {
+      "bundle_id": "payment-release",
+      "question": "Enable the vendor payment profile and terms?",
+      "grants": [
+        "payment_enable"
+      ],
+      "evidence": [
+        "draft-vendor-record",
+        "bank-check-42"
+      ],
+      "prereqs": [
+        "activate"
+      ],
+      "ready": true
+    },
+    {
+      "bundle_id": "first-funds",
+      "question": "Release the first irreversible payment transmission?",
+      "grants": [
+        "funds_release"
+      ],
+      "evidence": [
+        "payment-profile-42",
+        "remittance-preview-42"
+      ],
+      "prereqs": [
+        "remittance"
+      ],
+      "ready": false
+    }
   ],
-  "before_correction":{"collect":"EXECUTED","tax_check":"EXECUTED","bank_check":"EXECUTED","draft":"EXECUTED","followup":"EXECUTED","activate":"EXECUTED","erp_sync":"EXECUTED","purchasing":"EXECUTED","payments":"EXECUTED","terms":"EXECUTED","remittance":"EXECUTED","transmit":"BLOCKED"},
-  "affected_by_correction":["activate","erp_sync","payments","purchasing","remittance","terms","transmit"],
-  "after_correction":{"collect":"EXECUTED","tax_check":"EXECUTED","bank_check":"EXECUTED","draft":"EXECUTED","followup":"EXECUTED","activate":"ROLLED_BACK","erp_sync":"ROLLED_BACK","purchasing":"ROLLED_BACK","payments":"ROLLED_BACK","terms":"ROLLED_BACK","remittance":"ROLLED_BACK","transmit":"INVALIDATED"},
-  "irreversible_transmission_executed":false,
-  "receipts":[]
+  "before_correction": {
+    "collect": "EXECUTED",
+    "tax_check": "EXECUTED",
+    "bank_check": "EXECUTED",
+    "draft": "EXECUTED",
+    "followup": "EXECUTED",
+    "activate": "EXECUTED",
+    "erp_sync": "EXECUTED",
+    "purchasing": "EXECUTED",
+    "payments": "EXECUTED",
+    "terms": "EXECUTED",
+    "remittance": "EXECUTED",
+    "transmit": "BLOCKED"
+  },
+  "affected_by_correction": [
+    "activate",
+    "erp_sync",
+    "payments",
+    "purchasing",
+    "remittance",
+    "terms",
+    "transmit"
+  ],
+  "after_correction": {
+    "collect": "EXECUTED",
+    "tax_check": "EXECUTED",
+    "bank_check": "EXECUTED",
+    "draft": "EXECUTED",
+    "followup": "EXECUTED",
+    "activate": "ROLLED_BACK",
+    "erp_sync": "ROLLED_BACK",
+    "purchasing": "ROLLED_BACK",
+    "payments": "ROLLED_BACK",
+    "terms": "ROLLED_BACK",
+    "remittance": "ROLLED_BACK",
+    "transmit": "INVALIDATED"
+  },
+  "irreversible_transmission_executed": false,
+  "receipts": [
+    {
+      "action": "collect",
+      "result": {
+        "vendor_id": "V-42",
+        "name": "Acme Components",
+        "source": "vendor_portal"
+      }
+    },
+    {
+      "action": "bank_check",
+      "result": {
+        "vendor_id": "V-42",
+        "bank_status": "NEW_ACCOUNT",
+        "evidence": "bank-check-42"
+      }
+    },
+    {
+      "action": "tax_check",
+      "result": {
+        "vendor_id": "V-42",
+        "tax_status": "EXCEPTION_NAME_VARIANT",
+        "evidence": "tax-check-42"
+      }
+    },
+    {
+      "action": "draft",
+      "result": {
+        "vendor_id": "V-42",
+        "state": "DRAFT"
+      }
+    },
+    {
+      "action": "followup",
+      "result": {
+        "scheduled": true
+      }
+    },
+    {
+      "human_decision": "vendor-risk",
+      "approved": true,
+      "binding": "61d76bc7649bd178abc9845ccb9af397d3781789a42f391f86f085ab65e7fb18",
+      "prereq_receipts": {
+        "tax_check": {
+          "vendor_id": "V-42",
+          "tax_status": "EXCEPTION_NAME_VARIANT",
+          "evidence": "tax-check-42"
+        },
+        "bank_check": {
+          "vendor_id": "V-42",
+          "bank_status": "NEW_ACCOUNT",
+          "evidence": "bank-check-42"
+        }
+      }
+    },
+    {
+      "action": "activate",
+      "result": {
+        "vendor_id": "V-42",
+        "state": "ACTIVE"
+      }
+    },
+    {
+      "action": "erp_sync",
+      "result": {
+        "vendor_id": "V-42",
+        "erp": "SYNCED"
+      }
+    },
+    {
+      "action": "purchasing",
+      "result": {
+        "vendor_id": "V-42",
+        "purchase_channel": "OPEN"
+      }
+    },
+    {
+      "human_decision": "payment-release",
+      "approved": true,
+      "binding": "63d4c50f39d9d1f225172e27601f4bf47287cecb7942c600332fa217a11f2f39",
+      "prereq_receipts": {
+        "activate": {
+          "vendor_id": "V-42",
+          "state": "ACTIVE"
+        }
+      }
+    },
+    {
+      "action": "payments",
+      "result": {
+        "vendor_id": "V-42",
+        "payments": "ENABLED"
+      }
+    },
+    {
+      "action": "terms",
+      "result": {
+        "vendor_id": "V-42",
+        "terms": "NET_30"
+      }
+    },
+    {
+      "action": "remittance",
+      "result": {
+        "vendor_id": "V-42",
+        "remittance": "PREPARED",
+        "evidence": "remittance-preview-42"
+      }
+    },
+    {
+      "correction": "vendor-risk",
+      "reason": "Principal withdraws the previously granted vendor-risk authority",
+      "affected": [
+        "activate",
+        "erp_sync",
+        "payments",
+        "purchasing",
+        "remittance",
+        "terms",
+        "transmit"
+      ]
+    }
+  ]
 }

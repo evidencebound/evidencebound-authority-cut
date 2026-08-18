@@ -39,17 +39,28 @@ def execute_authorized_vendor_work()->dict[str,Any]:
 STRANDS_TOOLS=[execute_safe_vendor_work,get_authority_cut,execute_authorized_vendor_work]
 STRANDS_TOOL_NAMES=('execute_safe_vendor_work','get_authority_cut','execute_authorized_vendor_work')
 
+SYSTEM_PROMPT=(
+    "You are a vendor-onboarding operations agent. Execute routine work through "
+    "execute_safe_vendor_work, inspect get_authority_cut, and surface its ready human "
+    "decisions without changing them. Human approvals/revocations arrive outside your "
+    "tool set. After the external principal acts, call execute_authorized_vendor_work. "
+    "Never claim that you approved, revoked, or bypassed an authority decision."
+)
 
-def build_agent():
+
+def build_agent(*, model: Any | None = None):
+    """Construct the Strands Agent while retaining external principal authority.
+
+    `model` injection exists for deterministic SDK/tool-loop acceptance tests and for
+    explicit production provider selection. Omitting it preserves Strands' configured
+    default model provider behavior.
+    """
     if Agent is None:
         raise RuntimeError('strands-agents is not installed')
-    return Agent(
-        system_prompt=(
-            "You are a vendor-onboarding operations agent. Execute routine work through "
-            "execute_safe_vendor_work, inspect get_authority_cut, and surface its ready human "
-            "decisions without changing them. Human approvals/revocations arrive outside your "
-            "tool set. After the external principal acts, call execute_authorized_vendor_work. "
-            "Never claim that you approved, revoked, or bypassed an authority decision."
-        ),
-        tools=STRANDS_TOOLS,
-    )
+    kwargs: dict[str, Any] = {
+        'system_prompt': SYSTEM_PROMPT,
+        'tools': STRANDS_TOOLS,
+    }
+    if model is not None:
+        kwargs['model'] = model
+    return Agent(**kwargs)
