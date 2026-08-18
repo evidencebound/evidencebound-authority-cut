@@ -37,15 +37,24 @@ The retained result is `results/evaluation.json`.
 11. API and Strands adapter observe the same shared runtime state;
 12. local HTTP judge path fails closed on premature irreversible approval.
 
+## Public integration evidence
+
+Public GitHub Actions additionally verifies:
+
+- Python 3.11/3.12/3.13 deterministic lanes PASS;
+- current `strands-agents` installation PASS;
+- `build_agent()` constructs a real Strands `Agent` PASS;
+- the constructed Agent is supplied exactly the three non-authorizing tools.
+
+This is SDK/Agent-construction evidence, not a real foundation-model workflow run.
+
 ## Evidence class
 
-All current measurements are deterministic competition-period mechanism evidence. They do **not** establish human-time savings across organizations, model robustness, real vendor-system compensation reliability, real Strands execution, or AgentCore production behavior.
+The numeric measurements remain deterministic competition-period mechanism evidence. They do **not** establish human-time savings across organizations, model robustness, real vendor-system compensation reliability, real model execution, or AgentCore production behavior.
 
 ## External acceptance still required
 
-- networked install of current `strands-agents`;
-- real Strands model invocation through the three-tool boundary;
+- real Strands-supported model invocation through the three-tool boundary;
 - adversarial prompt attempts to self-approve/bypass authority;
-- public repository CI;
-- AWS deployment and external judge smoke;
-- AgentCore Runtime/Identity/Observability if the integration increases score without weakening the authority boundary.
+- AWS/AgentCore deployment and external judge smoke;
+- AgentCore Runtime/Identity/Observability only if the integration increases score without weakening the authority boundary.
