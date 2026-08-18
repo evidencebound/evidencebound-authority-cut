@@ -33,7 +33,20 @@ PYTHONPATH=src uvicorn authority_cut.api:app --host 127.0.0.1 --port 8080
 
 Human approve/revoke operations are external principal actions exposed by the API, not agent tools. The API and Strands adapter share the same process-local `ControlPlane`, so externally recorded authority changes are the state the agent observes when it resumes.
 
-A real `strands-agents` runtime cannot be executed in the current offline environment, so Strands execution remains **UNRUN/BLOCKED**, not PASS. The included CI lane is intended to install the SDK and instantiate the Strands agent once the source is pushed to a networked repository.
+Public GitHub Actions now provides a stronger integration gate: the runner installed the actual `strands-agents` package and successfully constructed `build_agent()` with this three-tool boundary. That verifies SDK compatibility and Agent construction. A real Strands-supported model has **not yet executed the full workflow**, so real model invocation remains `BLOCKED/UNVERIFIED` rather than being overstated as PASS.
+
+## Public verification
+
+- deterministic tests: **21/21 PASS** locally and on public GitHub Actions;
+- Python 3.11 / 3.12 / 3.13 CI lanes: **PASS**;
+- `strands-agents` install: **PASS** in public CI;
+- Strands `Agent` construction: **PASS** in public CI;
+- model toolset authority mutation check: **PASS**;
+- real Strands model invocation: **BLOCKED / UNVERIFIED**;
+- AgentCore deployment: **BLOCKED / UNVERIFIED**;
+- public judge endpoint: **BLOCKED / UNVERIFIED**.
+
+See `qa/QA_RECEIPT.json` and `handoff/AWS_JUDGE_PACK.md`.
 
 ## AgentCore
 
@@ -41,7 +54,7 @@ AgentCore is an advantageous deployment target, not a claimed integration. See `
 
 ## New-project boundary
 
-This source tree was authored for the AWS competition period. Pre-existing EvidenceBound concepts are disclosed in `docs/preexisting-work.md`; no source file from EvidenceBound Core, Recovery Mesh, Verified Memory, DataHub Gate, or SignalReview is copied here.
+This source tree was authored for the AWS competition period. The dedicated public repository was created on 2026-08-18, after the competition submission period opened. Pre-existing EvidenceBound concepts are disclosed in `docs/preexisting-work.md`; no source file from EvidenceBound Core, Recovery Mesh, Verified Memory, DataHub Gate, or SignalReview is copied here. The initial GitHub commit is preserved as the parent of the published competition source so repository timing remains auditable.
 
 ## Trust boundary
 
