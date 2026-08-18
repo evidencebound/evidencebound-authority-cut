@@ -7,12 +7,15 @@ Current evidence:
 - strict external-human authority boundary;
 - prerequisite-bound decision receipts;
 - correction propagation + compensation;
-- 21 local tests PASS;
+- 21 tests PASS locally and in public GitHub Actions;
+- Python 3.11/3.12/3.13 CI matrix PASS;
 - package install and compile PASS;
 - local HTTP judge flow PASS;
-- Strands adapter source present with exactly three non-authorizing model tools.
+- Strands adapter exposes exactly three non-authorizing model tools;
+- real `strands-agents` package install PASS in public CI;
+- `build_agent()` / Strands Agent construction PASS in public CI.
 
-Gap: real Strands runtime and AWS/AgentCore deployment remain unverified. The public competition repository now exists; GitHub CI becomes evidence only after the published source head completes successfully.
+Remaining gap: a real Strands-supported model has not yet invoked the end-to-end workflow, and AWS/AgentCore/public deployment remain unverified. These states must remain BLOCKED until live evidence exists.
 
 ## Design
 
@@ -28,4 +31,4 @@ Competition thesis: semantic Authority Cut computation plus post-approval correc
 
 ## Presentation readiness
 
-Local judge surface and deterministic evidence ledger exist. Final video/public URL are intentionally separate handoff work.
+Dedicated public repository, public CI, local judge surface and deterministic evidence ledger exist. Final live model path, AgentCore/public judge deployment, and video remain submission-handoff work rather than claimed completion.
