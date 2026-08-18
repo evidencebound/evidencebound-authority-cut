@@ -1,6 +1,6 @@
 {
   "snapshot_date": "2026-08-18",
-  "evidence_class": "local controlled competition-period control kernel",
+  "evidence_class": "controlled competition-period kernel + public GitHub CI/Strands construction evidence",
   "checks": {
     "pytest_21": "PASS",
     "compileall": "PASS",
@@ -9,24 +9,32 @@
     "controlled_evaluation_reproduction_byte_for_byte": "PASS",
     "local_http_judge_path": "PASS",
     "model_toolset_has_no_approve_or_revoke": "PASS",
-    "strands_sdk_absence_truth_gate": "PASS",
     "obvious_secret_scan": "PASS",
-    "real_strands_execution": "BLOCKED",
+    "public_github_repo": "PASS",
+    "public_github_ci": "PASS",
+    "strands_sdk_install": "PASS",
+    "strands_agent_construction": "PASS",
+    "real_strands_model_invocation": "BLOCKED",
     "agentcore_deployment": "BLOCKED",
-    "public_github_ci": "BLOCKED_PENDING_SOURCE_PUBLICATION",
     "public_deployment": "BLOCKED",
     "ruff": "UNRUN",
     "mypy": "UNRUN",
     "bandit": "UNRUN",
-    "pip_audit": "UNRUN",
-    "public_github_repo": "PASS"
+    "pip_audit": "UNRUN"
+  },
+  "public_ci_evidence": {
+    "workflow_run_id": 32179743430,
+    "tested_branch_head": "e297a0600ca2ccfbdff1eec3fbf9309e71eff37c",
+    "conclusion": "success",
+    "strands_lane": "PASS: SDK installed and build_agent() constructed with non-authorizing toolset"
   },
   "retained_result_sha256": {
     "controlled_demo": "bf6f09beb1e793212ffcba652f5d0c5dc0d07b6eb5c59771ef4d9ccc376945c3",
     "evaluation": "71f068e746f3de694354ce3d9e2cbb5c518e76181b95f94fd06138ee9430fe93"
   },
   "limits": [
-    "Real Strands and AgentCore behavior is unverified in the offline environment.",
+    "No real model invocation has yet executed the full workflow through Strands.",
+    "AgentCore behavior is unverified until authenticated live deployment.",
     "The 57.14 percent prompt reduction is only the fixed controlled workflow calculation.",
     "Principal authentication and distributed durable authority state are not implemented."
   ]
