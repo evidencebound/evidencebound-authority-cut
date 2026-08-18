@@ -4,7 +4,7 @@
 
 ## Controlled evidence available now
 
-The competition-period deterministic control kernel implements one deep vendor-onboarding workflow:
+The competition-period control kernel implements one deep vendor-onboarding workflow:
 
 - 5 safe actions execute before human attention is required;
 - 7 protected tool effects are governed by 3 policy-defined human authority decisions;
@@ -33,7 +33,9 @@ PYTHONPATH=src uvicorn authority_cut.api:app --host 127.0.0.1 --port 8080
 
 Human approve/revoke operations are external principal actions exposed by the API, not agent tools. The API and Strands adapter share the same process-local `ControlPlane`, so externally recorded authority changes are the state the agent observes when it resumes.
 
-Public GitHub Actions now provides a stronger integration gate: the runner installed the actual `strands-agents` package and successfully constructed `build_agent()` with this three-tool boundary. That verifies SDK compatibility and Agent construction. A real Strands-supported model has **not yet executed the full workflow**, so real model invocation remains `BLOCKED/UNVERIFIED` rather than being overstated as PASS.
+Public GitHub Actions now verifies more than import compatibility: it installs the real `strands-agents` SDK, constructs the published `Agent`, and executes the real Strands Agent loop through all three published tools using a deterministic custom Strands `Model` provider. The trace proves safe work, authority-surface inspection, externally granted resume, and correction/rollback while the model tool set has no authority mutation function.
+
+That CI proof establishes **real Strands SDK orchestration/tool execution**, but not foundation-model quality. A Bedrock/other foundation model has not yet executed the full workflow, so foundation-model invocation remains `BLOCKED/UNVERIFIED`.
 
 ## Public verification
 
@@ -41,8 +43,10 @@ Public GitHub Actions now provides a stronger integration gate: the runner insta
 - Python 3.11 / 3.12 / 3.13 CI lanes: **PASS**;
 - `strands-agents` install: **PASS** in public CI;
 - Strands `Agent` construction: **PASS** in public CI;
+- real Strands Agent loop with deterministic custom Model provider: **PASS**;
+- all three published model-callable tools executed through Strands: **PASS**;
 - model toolset authority mutation check: **PASS**;
-- real Strands model invocation: **BLOCKED / UNVERIFIED**;
+- foundation-model invocation: **BLOCKED / UNVERIFIED**;
 - AgentCore deployment: **BLOCKED / UNVERIFIED**;
 - public judge endpoint: **BLOCKED / UNVERIFIED**.
 
