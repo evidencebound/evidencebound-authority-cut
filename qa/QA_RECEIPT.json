@@ -1,6 +1,6 @@
 {
-  "snapshot_date": "2026-08-18",
-  "evidence_class": "controlled competition-period kernel + public GitHub CI/real Strands Agent-loop evidence",
+  "snapshot_date": "2026-08-19",
+  "evidence_class": "controlled competition-period kernel + public GitHub CI + live Vercel real-Strands Agent-loop acceptance",
   "checks": {
     "pytest_21": "PASS",
     "compileall": "PASS",
@@ -12,35 +12,92 @@
     "obvious_secret_scan": "PASS",
     "public_github_repo": "PASS",
     "public_github_ci": "PASS",
-    "strands_sdk_install": "PASS",
+    "strands_sdk_install_1_52_0": "PASS",
     "strands_agent_construction": "PASS",
     "strands_agent_loop_deterministic_model": "PASS",
     "strands_three_tool_execution": "PASS",
-    "foundation_model_invocation": "BLOCKED",
+    "public_vercel_project": "PASS",
+    "public_vercel_build": "PASS",
+    "public_vercel_health": "PASS",
+    "public_vercel_tool_boundary": "PASS",
+    "public_vercel_evaluation": "PASS",
+    "public_vercel_real_strands_proof": "PASS",
+    "public_vercel_runtime_strands_trace": "PASS",
+    "gateway_openai_provider_install": "PASS",
+    "gateway_no_credential_fail_closed": "PASS",
+    "direct_vercel_gateway_credential_absence_confirmed": "PASS",
+    "gateway_request_suppressed_before_model_execution": "PASS",
+    "foundation_model_invocation": "UNRUN",
+    "foundation_model_blocker": "BLOCKED",
+    "aws_oidc_assume_role": "BLOCKED",
+    "bedrock_discovery": "UNRUN",
+    "aws_paid_model_invocation": "UNRUN",
+    "aws_resource_mutation": "UNRUN",
     "agentcore_deployment": "BLOCKED",
-    "public_deployment": "BLOCKED",
     "ruff": "UNRUN",
     "mypy": "UNRUN",
     "bandit": "UNRUN",
     "pip_audit": "UNRUN"
   },
   "public_ci_evidence": {
-    "workflow_run_id": 32180475314,
-    "tested_branch_head": "27f433ecb12fc57ef087b6aa6bf4df9a78ba1004",
-    "conclusion": "success",
+    "live_surface_ci_run_id": 32219499297,
+    "foundation_provider_contract_run_id": 32220265475,
+    "foundation_provider_contract_result": "PASS",
     "strands_sdk_version_observed": "1.52.0",
-    "strands_runtime_job_id": 95852058241,
-    "strands_lane": "PASS: SDK installed, Agent constructed, real Strands Agent loop executed the published three-tool workflow with a deterministic custom Model provider",
-    "foundation_model_invocation": "UNVERIFIED"
+    "strands_lane": "PASS: SDK installed, Agent constructed, real Strands Agent loop executed the published three-tool workflow and deployable Vercel entrypoint",
+    "gateway_lane": "PASS: pinned OpenAI-compatible Strands provider installed and missing runtime credentials fail closed before network/model execution"
+  },
+  "production_evidence": {
+    "provider": "Vercel",
+    "project_name": "evidencebound-authority-cut",
+    "project_id": "prj_WPX42JQ08alE6WfuqlS0xA8XpBzT",
+    "production_url": "https://evidencebound-authority-cut.vercel.app",
+    "canonical_source_commit": "1cf640d735d822f3a66c517e5eeb8711fec2a040",
+    "accepted_deployment_id": "dpl_8b5jXwdhD57u2b4XfvWNRJSLsrey",
+    "framework": "fastapi",
+    "python": "3.12",
+    "region": "iad1",
+    "live_result": {
+      "execution": "REAL_STRANDS_AGENT_LOOP_DETERMINISTIC_MODEL",
+      "authority_mutation_tools": [],
+      "authority_boundary": "EXTERNAL_HUMAN_ONLY",
+      "safe_actions_preserved": 5,
+      "protected_reversible_effects_rolled_back": 6,
+      "irreversible_transmit_after_correction": "INVALIDATED",
+      "receipt_count": 14
+    }
+  },
+  "foundation_model_boundary": {
+    "status": "BLOCKED_RUNTIME_GATEWAY_CREDENTIAL",
+    "provider_contract": "PASS",
+    "configured_model": "alibaba/qwen3.5-flash",
+    "configured_gateway": "https://ai-gateway.vercel.sh/v1",
+    "actual_invocation": "UNRUN",
+    "runtime_ai_gateway_api_key_present": false,
+    "runtime_vercel_oidc_token_present": false,
+    "model_request_reached_gateway": false,
+    "transient_model_call_capability": "REMOVED",
+    "receipt_only_deployment_id": "dpl_DhThxgrR4R5wf2T79Ws2Da6poMwh"
+  },
+  "aws_capability_boundary": {
+    "status": "BLOCKED_AWS_OIDC_TRUST",
+    "probe_run_id": 32219855151,
+    "candidate_role": "arn:aws:iam::877348951762:role/EvidenceBoundGitHubDeployRole",
+    "assume_role_with_web_identity": "BLOCKED_NOT_AUTHORIZED",
+    "bedrock_discovery": "UNRUN",
+    "paid_model_invocation": "UNRUN",
+    "resource_mutation": "UNRUN"
   },
   "retained_result_sha256": {
     "controlled_demo": "bf6f09beb1e793212ffcba652f5d0c5dc0d07b6eb5c59771ef4d9ccc376945c3",
     "evaluation": "71f068e746f3de694354ce3d9e2cbb5c518e76181b95f94fd06138ee9430fe93"
   },
   "limits": [
-    "The public Strands loop proof uses a deterministic custom Model provider; no foundation model quality is inferred.",
-    "AgentCore behavior is unverified until authenticated live deployment.",
-    "The 57.14 percent prompt reduction is only the fixed controlled workflow calculation.",
-    "Principal authentication and distributed durable authority state are not implemented."
+    "The live public Strands proof uses a deterministic custom Model provider; no foundation-model quality is inferred.",
+    "The optional foundation-model adapter passed its provider/fail-closed contract but no model request reached the gateway because runtime credentials were absent.",
+    "AgentCore behavior is unverified; the current repository identity is not authorized to assume the probed AWS role.",
+    "The 57.14 percent prompt reduction is only the fixed controlled-workflow calculation.",
+    "Principal authentication and distributed durable authority state are not implemented.",
+    "No general safety, corrigibility or productivity claim is made."
   ]
 }

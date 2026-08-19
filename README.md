@@ -1,19 +1,86 @@
 # Authority Cut — Reversible Autonomy with Strands Agents
 
-**One-line pitch:** A professional agent completes routine work autonomously, then exposes the smallest **policy-valid semantic authority set** needed for protected downstream effects; a later human correction propagates through already-executed reversible descendants without erasing unrelated work.
+**One-line pitch:** A professional agent completes routine work autonomously, exposes only the smallest policy-valid semantic human authorities for protected effects, and propagates later human correction through already-executed reversible descendants without erasing unrelated safe work.
 
-## Controlled evidence available now
+## Submission readiness — READY
 
-The competition-period control kernel implements one deep vendor-onboarding workflow:
+Authority Cut is engineering-ready for **AWS Agents for Humans** except for final registration/media/form work. The required Strands integration, real tool execution, deep professional workflow, selective human intervention, correction propagation, reversible recovery, irreversible-action gating, provenance, public repository, public CI, and live public judge path are implemented and verified.
 
-- 5 safe actions execute before human attention is required;
-- 7 protected tool effects are governed by 3 policy-defined human authority decisions;
-- the controlled per-protected-effect baseline is therefore 7 prompts versus 3 Authority Cut decisions (`57.14%` fewer prompts in this fixed workflow);
-- first-funds remains a distinct irreversible authority and cannot be approved before its remittance-preview prerequisite exists;
-- after vendor-risk authority is revoked, 6 executed reversible protected effects are compensated while the pending irreversible transfer is invalidated;
-- the Strands model-callable tool set contains **no approve or revoke function**.
+Public judge URL:
 
-These are controlled mechanism results, not general productivity or safety claims.
+`https://evidencebound-authority-cut.vercel.app`
+
+Public repository:
+
+`https://github.com/moneyparking/evidencebound-authority-cut`
+
+Two score-upgrade paths remain deliberately separate from project completion:
+
+- foundation-model-backed Strands acceptance: **UNRUN / BLOCKED_RUNTIME_GATEWAY_CREDENTIAL**;
+- Amazon Bedrock AgentCore deployment: **BLOCKED_AWS_OIDC_TRUST**.
+
+Neither is represented as completed. AgentCore is optional under the current competition rules; the public submission path already executes the real Strands SDK Agent/tool loop. The repository contains a fail-closed optional foundation-model adapter so that acceptance can be rerun if a runtime credential becomes available without changing the Authority Cut semantics.
+
+## What the live path proves
+
+The fixed vendor-onboarding workflow contains:
+
+- **5 safe actions** that execute before human attention;
+- **7 protected effects** governed by **3 policy-defined semantic authority decisions**;
+- a controlled baseline of 7 per-effect prompts versus 3 Authority Cut decisions (`57.14%` fewer prompts in this fixed workflow);
+- a distinct `first-funds` irreversible authority that cannot become ready until a remittance-preview receipt exists;
+- correction propagation that compensates **6 already-executed reversible protected effects** after `vendor-risk` is revoked;
+- preservation of all **5 unrelated safe actions** after the correction;
+- invalidation of the pending irreversible transfer rather than pretending it was rolled back;
+- a Strands model-callable tool set containing **no approve or revoke function**.
+
+These are controlled fixed-workflow results, not generalized safety or productivity claims.
+
+## Real Strands execution
+
+The model-callable Strands tools are exactly:
+
+1. `execute_safe_vendor_work`
+2. `get_authority_cut`
+3. `execute_authorized_vendor_work`
+
+Human approve/revoke operations are external principal actions. They are not present in the Strands tool schema.
+
+Public GitHub Actions installs `strands-agents==1.52.0`, constructs the published `Agent`, and executes the real Strands Agent loop through the three tools using a deterministic custom Strands `Model` provider. The deployable public surface is tested through that same loop.
+
+The live Vercel judge path then executes the real Strands loop again. Its accepted proof returned:
+
+```text
+execution = REAL_STRANDS_AGENT_LOOP_DETERMINISTIC_MODEL
+authority_mutation_tools = []
+authority_boundary = EXTERNAL_HUMAN_ONLY
+safe_actions_preserved = 5
+protected_reversible_effects_rolled_back = 6
+irreversible_transmit_after_correction = INVALIDATED
+receipt_count = 14
+```
+
+Vercel runtime logs also observed the real tool-call sequence: safe execution -> authority-cut inspection -> externally authorized resume -> next authority cut -> externally authorized resume -> correction propagation.
+
+## Public judge path
+
+Open:
+
+`https://evidencebound-authority-cut.vercel.app`
+
+Then run **Run live Strands judge path**. The page executes a reset-each-call synthetic vendor workflow and displays the execution ledger.
+
+Machine-readable routes:
+
+- `/health`
+- `/api/tool-boundary`
+- `/api/evaluation`
+- `POST /api/strands-proof`
+- `/api/strands-proof-get` — acceptance alias for automated verification
+
+The live proof uses only synthetic in-memory workflow state and does not create external vendor/payment effects.
+
+## Controlled evidence
 
 ```bash
 python -m pip install -e '.[dev]' --no-build-isolation
@@ -23,43 +90,56 @@ PYTHONPATH=src python scripts/run_evaluation.py
 PYTHONPATH=src uvicorn authority_cut.api:app --host 127.0.0.1 --port 8080
 ```
 
-## Strands boundary
+Public CI gates:
 
-`authority_cut.strands_app` is the competition-period Strands orchestration adapter. Its model-callable tools are exactly:
+- deterministic kernel Python 3.11: **PASS**;
+- deterministic kernel Python 3.12: **PASS**;
+- deterministic kernel Python 3.13: **PASS**;
+- compile gate: **PASS**;
+- actual Strands SDK install: **PASS**;
+- Strands Agent construction: **PASS**;
+- real Strands deterministic-model Agent loop: **PASS**;
+- deployable public Strands judge surface: **PASS**;
+- exact Vercel entrypoint acceptance: **PASS**;
+- optional OpenAI-compatible Strands provider install: **PASS**;
+- optional Gateway path without runtime credential fails closed before network/model execution: **PASS**.
 
-1. `execute_safe_vendor_work`
-2. `get_authority_cut`
-3. `execute_authorized_vendor_work`
+## Foundation-model boundary
 
-Human approve/revoke operations are external principal actions exposed by the API, not agent tools. The API and Strands adapter share the same process-local `ControlPlane`, so externally recorded authority changes are the state the agent observes when it resumes.
+The optional adapter in `authority_cut.gateway_proof` is wired for a Strands `OpenAIModel` against an OpenAI-compatible gateway while retaining the exact same three non-authorizing tools and external-human authority mutations.
 
-Public GitHub Actions now verifies more than import compatibility: it installs the real `strands-agents` SDK, constructs the published `Agent`, and executes the real Strands Agent loop through all three published tools using a deterministic custom Strands `Model` provider. The trace proves safe work, authority-surface inspection, externally granted resume, and correction/rollback while the model tool set has no authority mutation function.
+Its no-network CI contract passes. A protected Vercel acceptance attempt showed that the directly deployed runtime had neither `AI_GATEWAY_API_KEY` nor `VERCEL_OIDC_TOKEN`; the proof therefore failed closed before any gateway/model request. The transient model-call route was subsequently removed and replaced by a receipt-only surface.
 
-That CI proof establishes **real Strands SDK orchestration/tool execution**, but not foundation-model quality. A Bedrock/other foundation model has not yet executed the full workflow, so foundation-model invocation remains `BLOCKED/UNVERIFIED`.
+Correct status:
 
-## Public verification
+- provider integration contract: **PASS**;
+- actual foundation-model invocation: **UNRUN**;
+- blocker: **RUNTIME_GATEWAY_CREDENTIAL_UNAVAILABLE**;
+- model spend reached: **NO**.
 
-- deterministic tests: **21/21 PASS** locally and on public GitHub Actions;
-- Python 3.11 / 3.12 / 3.13 CI lanes: **PASS**;
-- `strands-agents` install: **PASS** in public CI;
-- Strands `Agent` construction: **PASS** in public CI;
-- real Strands Agent loop with deterministic custom Model provider: **PASS**;
-- all three published model-callable tools executed through Strands: **PASS**;
-- model toolset authority mutation check: **PASS**;
-- foundation-model invocation: **BLOCKED / UNVERIFIED**;
-- AgentCore deployment: **BLOCKED / UNVERIFIED**;
-- public judge endpoint: **BLOCKED / UNVERIFIED**.
+Do not infer foundation-model quality from the deterministic live proof.
 
-See `qa/QA_RECEIPT.json` and `handoff/AWS_JUDGE_PACK.md`.
+## AgentCore boundary
 
-## AgentCore
+AgentCore remains a valuable Technical Implementation upgrade, but not a claimed integration. A non-mutating GitHub OIDC probe against the existing EvidenceBound AWS deployment role returned `Not authorized to perform sts:AssumeRoleWithWebIdentity` for the new Authority Cut repository identity. No Bedrock discovery, model invocation, or AWS resource mutation was attempted after that denial.
 
-AgentCore is an advantageous deployment target, not a claimed integration. See `docs/agentcore-decision.md`.
+Correct status:
 
-## New-project boundary
+- AgentCore architecture/evaluation: **prepared**;
+- authenticated AWS deployment: **BLOCKED_AWS_OIDC_TRUST**;
+- AWS resource mutation by the probe: **UNRUN**;
+- paid AWS model invocation by the probe: **UNRUN**.
 
-This source tree was authored for the AWS competition period. The dedicated public repository was created on 2026-08-18, after the competition submission period opened. Pre-existing EvidenceBound concepts are disclosed in `docs/preexisting-work.md`; no source file from EvidenceBound Core, Recovery Mesh, Verified Memory, DataHub Gate, or SignalReview is copied here. The initial GitHub commit is preserved as the parent of the published competition source so repository timing remains auditable.
+See `docs/agentcore-decision.md` and `docs/aws-capability-boundary.md`.
+
+## New-project / pre-existing-work boundary
+
+This source tree was authored for the AWS competition period. The dedicated public repository was created after the competition submission period opened. Pre-existing EvidenceBound concepts — provenance/evidence binding, dependency graphs, fail-closed verification, selective invalidation/recovery and proof receipts — are disclosed in `docs/preexisting-work.md`.
+
+No source file from EvidenceBound Core, Recovery Mesh, Verified Memory, DataHub Gate or SignalReview is copied into this project. The original GitHub initial commit is preserved as the parent of the competition source publication so repository timing remains auditable.
 
 ## Trust boundary
 
-Authority Cut does not prove policy correctness, legal authorization, safe compensation in arbitrary external systems, or general corrigibility. Minimality is exact only over the policy-defined semantic decision bundles supplied to the runtime.
+Authority Cut does not prove policy correctness, legal authorization, safe compensation in arbitrary external systems, authenticated principal identity, distributed durable authority state, general corrigibility, or generalized productivity improvement. Minimality is exact only over the policy-defined semantic decision bundles supplied to the runtime.
+
+See `handoff/AWS_JUDGE_PACK.md`, `handoff/DEVPOST_FINAL_CHECKLIST.md`, `docs/claims-ledger.md`, and `qa/QA_RECEIPT.json`.
