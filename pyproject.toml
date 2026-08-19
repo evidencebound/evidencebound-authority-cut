@@ -12,6 +12,7 @@ dependencies = ["fastapi>=0.110", "uvicorn>=0.27"]
 
 [project.optional-dependencies]
 aws = ["strands-agents==1.52.0"]
+gateway = ["strands-agents[openai]==1.52.0"]
 dev = ["pytest>=8", "httpx2>=0.1"]
 
 [tool.pytest.ini_options]
