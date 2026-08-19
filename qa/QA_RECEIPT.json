@@ -25,16 +25,15 @@
     "public_vercel_runtime_strands_trace": "PASS",
     "gateway_openai_provider_install": "PASS",
     "gateway_no_credential_fail_closed": "PASS",
+    "direct_vercel_gateway_credential_absence_confirmed": "PASS",
+    "gateway_request_suppressed_before_model_execution": "PASS",
     "foundation_model_invocation": "UNRUN",
-    "foundation_model_blocker": "BLOCKED_RUNTIME_GATEWAY_CREDENTIAL",
-    "direct_vercel_has_ai_gateway_api_key": "FAIL_FALSE",
-    "direct_vercel_has_vercel_oidc_token": "FAIL_FALSE",
-    "model_request_reached_gateway": "UNRUN_NO",
-    "aws_oidc_probe": "BLOCKED_AWS_OIDC_TRUST",
+    "foundation_model_blocker": "BLOCKED",
+    "aws_oidc_assume_role": "BLOCKED",
     "bedrock_discovery": "UNRUN",
     "aws_paid_model_invocation": "UNRUN",
     "aws_resource_mutation": "UNRUN",
-    "agentcore_deployment": "BLOCKED_AWS_OIDC_TRUST",
+    "agentcore_deployment": "BLOCKED",
     "ruff": "UNRUN",
     "mypy": "UNRUN",
     "bandit": "UNRUN",
@@ -69,6 +68,7 @@
     }
   },
   "foundation_model_boundary": {
+    "status": "BLOCKED_RUNTIME_GATEWAY_CREDENTIAL",
     "provider_contract": "PASS",
     "configured_model": "alibaba/qwen3.5-flash",
     "configured_gateway": "https://ai-gateway.vercel.sh/v1",
@@ -80,6 +80,7 @@
     "receipt_only_deployment_id": "dpl_DhThxgrR4R5wf2T79Ws2Da6poMwh"
   },
   "aws_capability_boundary": {
+    "status": "BLOCKED_AWS_OIDC_TRUST",
     "probe_run_id": 32219855151,
     "candidate_role": "arn:aws:iam::877348951762:role/EvidenceBoundGitHubDeployRole",
     "assume_role_with_web_identity": "BLOCKED_NOT_AUTHORIZED",
