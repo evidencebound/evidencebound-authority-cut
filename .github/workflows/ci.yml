@@ -30,6 +30,24 @@ jobs:
         run: python scripts/run_strands_ci_probe.py
       - name: Execute deployable public Strands judge surface
         run: python scripts/run_public_strands_surface_probe.py
+      - name: Verify Vercel entrypoint acceptance alias
+        run: |
+          python - <<'PY'
+          from fastapi.testclient import TestClient
+          from vercel_main import app
+          c=TestClient(app)
+          r=c.get('/api/strands-proof-get')
+          assert r.status_code==200
+          p=r.json()
+          assert p['execution']=='REAL_STRANDS_AGENT_LOOP_DETERMINISTIC_MODEL'
+          assert p['authority_mutation_tools']==[]
+          assert p['safe_actions_preserved']==5
+          assert p['protected_reversible_effects_rolled_back']==6
+          assert p['irreversible_transmit_after_correction']=='INVALIDATED'
+          assert p['foundation_model_invocation']=='UNVERIFIED'
+          assert p['agentcore']=='UNVERIFIED'
+          print('VERCEL_ENTRYPOINT_STRANDS_PROOF=PASS')
+          PY
   source-snapshot:
     runs-on: ubuntu-latest
     steps:
