@@ -1,0 +1,2 @@
+fastapi>=0.110
+strands-agents==1.52.0

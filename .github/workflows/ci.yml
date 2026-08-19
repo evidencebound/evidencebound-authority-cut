@@ -28,6 +28,8 @@ jobs:
         run: python -c "from authority_cut.strands_app import STRANDS_TOOL_NAMES, build_agent; a=build_agent(); print(STRANDS_TOOL_NAMES); assert not any(x in STRANDS_TOOL_NAMES for x in ('apply_human_decision','revoke_human_decision'))"
       - name: Execute real Strands Agent loop with deterministic model provider
         run: python scripts/run_strands_ci_probe.py
+      - name: Execute deployable public Strands judge surface
+        run: python scripts/run_public_strands_surface_probe.py
   source-snapshot:
     runs-on: ubuntu-latest
     steps:
