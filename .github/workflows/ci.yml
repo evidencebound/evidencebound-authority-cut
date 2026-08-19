@@ -28,3 +28,21 @@ jobs:
         run: python -c "from authority_cut.strands_app import STRANDS_TOOL_NAMES, build_agent; a=build_agent(); print(STRANDS_TOOL_NAMES); assert not any(x in STRANDS_TOOL_NAMES for x in ('apply_human_decision','revoke_human_decision'))"
       - name: Execute real Strands Agent loop with deterministic model provider
         run: python scripts/run_strands_ci_probe.py
+  source-snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Archive exact tested source tree
+        run: |
+          git archive --format=zip HEAD -o authority-cut-source.zip
+          sha256sum authority-cut-source.zip > authority-cut-source.zip.sha256
+          git rev-parse HEAD > tested-head.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: authority-cut-source-snapshot
+          path: |
+            authority-cut-source.zip
+            authority-cut-source.zip.sha256
+            tested-head.txt
+          if-no-files-found: error
+          retention-days: 30
