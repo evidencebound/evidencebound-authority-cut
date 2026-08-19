@@ -27,6 +27,7 @@ jobs:
           role-to-assume: ${{ env.CANDIDATE_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
           role-session-name: authority-cut-probe-${{ github.run_id }}
+          retry-max-attempts: 3
 
       - name: Record OIDC boundary
         run: |
