@@ -1,0 +1,57 @@
+name: AWS OIDC capability probe
+
+on:
+  push:
+    branches: [agent/aws-oidc-probe]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  oidc-capability:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: us-east-1
+      CANDIDATE_ROLE_ARN: arn:aws:iam::877348951762:role/EvidenceBoundGitHubDeployRole
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Attempt existing EvidenceBound GitHub OIDC role
+        id: oidc
+        continue-on-error: true
+        uses: aws-actions/configure-aws-credentials@v6.2.3
+        with:
+          role-to-assume: ${{ env.CANDIDATE_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: authority-cut-probe-${{ github.run_id }}
+
+      - name: Record OIDC boundary
+        run: |
+          echo "OIDC_ACTION_OUTCOME=${{ steps.oidc.outcome }}"
+          if [ "${{ steps.oidc.outcome }}" != "success" ]; then
+            echo "AWS_OIDC_AUTHORITY_CUT=BLOCKED"
+            echo "No AWS resources or paid model calls were attempted."
+            exit 0
+          fi
+          aws sts get-caller-identity
+          echo "AWS_OIDC_AUTHORITY_CUT=PASS"
+
+          set +e
+          aws bedrock list-foundation-models \
+            --region "$AWS_REGION" \
+            --by-provider amazon \
+            --query 'modelSummaries[].modelId' \
+            --output json >/tmp/bedrock-models.json 2>/tmp/bedrock-error.txt
+          BEDROCK_RC=$?
+          set -e
+          if [ "$BEDROCK_RC" -eq 0 ]; then
+            echo "BEDROCK_DISCOVERY_PERMISSION=PASS"
+            cat /tmp/bedrock-models.json
+          else
+            echo "BEDROCK_DISCOVERY_PERMISSION=BLOCKED"
+            sed -E 's/[A-Za-z0-9+\/=]{40,}/[REDACTED]/g' /tmp/bedrock-error.txt
+          fi
+          echo "PAID_MODEL_INVOCATION=UNRUN"
+          echo "AWS_RESOURCE_MUTATION=UNRUN"
