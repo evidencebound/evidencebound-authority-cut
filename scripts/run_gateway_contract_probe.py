@@ -6,8 +6,10 @@ import os
 for name in ("AI_GATEWAY_API_KEY", "VERCEL_OIDC_TOKEN"):
     os.environ.pop(name, None)
 
+from fastapi.testclient import TestClient
 from authority_cut.gateway_proof import DEFAULT_GATEWAY_MODEL, GATEWAY_BASE_URL, run_gateway_strands_proof
 from authority_cut.strands_app import STRANDS_TOOL_NAMES
+from gateway_preview import app as preview_app
 from strands.models.openai import OpenAIModel
 
 assert DEFAULT_GATEWAY_MODEL == "alibaba/qwen3.5-flash"
@@ -18,6 +20,15 @@ assert STRANDS_TOOL_NAMES == (
     "execute_authorized_vendor_work",
 )
 assert OpenAIModel is not None
+
+health = TestClient(preview_app).get("/health")
+assert health.status_code == 200
+assert health.json() == {
+    "status": "READY_FOR_PROTECTED_ACCEPTANCE",
+    "model": "alibaba/qwen3.5-flash",
+    "public_route": "DISALLOWED",
+    "agentcore": "UNVERIFIED",
+}
 
 try:
     run_gateway_strands_proof()
