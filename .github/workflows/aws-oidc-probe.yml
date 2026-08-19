@@ -3,6 +3,7 @@ name: AWS OIDC capability probe
 on:
   push:
     branches: [agent/aws-oidc-probe]
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -29,6 +30,7 @@ jobs:
 
       - name: Record OIDC boundary
         run: |
+          echo "GITHUB_EVENT_NAME=${GITHUB_EVENT_NAME}"
           echo "OIDC_ACTION_OUTCOME=${{ steps.oidc.outcome }}"
           if [ "${{ steps.oidc.outcome }}" != "success" ]; then
             echo "AWS_OIDC_AUTHORITY_CUT=BLOCKED"
