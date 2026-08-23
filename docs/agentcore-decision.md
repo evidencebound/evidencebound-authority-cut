@@ -2,16 +2,14 @@
 
 ## Decision
 
-Amazon Bedrock AgentCore is a **non-blocking Technical Implementation score upgrade**, not a completion requirement for Authority Cut.
+Amazon Bedrock AgentCore is now a **verified Technical Implementation score upgrade** for Authority Cut.
 
-The competition's required Strands-centered professional agent path is already implemented and publicly executable. The canonical judge service runs the real Strands SDK Agent/tool loop, preserves the external-human-only authority boundary, propagates correction through reversible descendants, and gates the irreversible transfer.
-
-AgentCore would still be valuable because Runtime, Identity and Observability could strengthen deployment reliability, principal identity and judge traceability. It must not be added merely as an infrastructure checkbox or in a way that weakens the control boundary.
+The required Strands-centered professional-agent path remains independently public and executable on the canonical judge surface. AgentCore was added only after that path was accepted, and the integration preserves the exact same external-human authority boundary rather than changing the project semantics to satisfy an infrastructure checkbox.
 
 ## Current verified state
 
 - dedicated public competition repository: **PASS**;
-- public GitHub Actions: **PASS**;
+- public GitHub Actions baseline: **PASS**;
 - `strands-agents==1.52.0` installation: **PASS**;
 - published Strands `Agent` construction: **PASS**;
 - real Strands Agent/tool loop: **PASS** in CI and live public Vercel production;
@@ -20,49 +18,77 @@ AgentCore would still be valuable because Runtime, Identity and Observability co
 - correction propagation / reversible compensation: **PASS**;
 - optional OpenAI-compatible foundation-model provider contract: **PASS**;
 - actual foundation-model execution: **UNRUN / BLOCKED_RUNTIME_GATEWAY_CREDENTIAL**;
-- AgentCore authenticated deployment: **UNRUN / BLOCKED_AWS_OIDC_TRUST**.
+- AgentCore direct-code adapter contract: **PASS**;
+- AgentCore Runtime deployment: **PASS**;
+- AgentCore live invocation: **PASS**;
+- real Strands loop inside AgentCore: **PASS**.
 
-## Exact AWS capability blocker
+## Accepted AgentCore configuration
 
-A non-mutating GitHub Actions capability probe attempted the pre-existing EvidenceBound deployment role candidate:
+- region: `eu-central-1` (Frankfurt)
+- Runtime name: `AuthorityCutRuntime`
+- Runtime version: `1`
+- status: `READY`
+- deployment mode: direct code / S3 CodeZip
+- runtime: `PYTHON_3_13`
+- entry point: `agentcore_main.py`
+- network mode: `PUBLIC`
+- packaged source HEAD: `200d71f963bb4496a6f01a6cf1788695b3164739`
+- CodeZip SHA-256: `67c9ce7de97f48970d3c595e6914fef314011fa5cebccf4f01cd4b6bea32690e`
 
-`arn:aws:iam::877348951762:role/EvidenceBoundGitHubDeployRole`
+Public evidence intentionally omits AWS account, role and bucket identifiers.
 
-Canonical probe:
+## Acceptance assertions
 
-- workflow run: `32219855151`;
-- repository: `moneyparking/evidencebound-authority-cut`;
-- operation attempted: GitHub OIDC -> `sts:AssumeRoleWithWebIdentity` only;
-- result: **BLOCKED** — `Not authorized to perform sts:AssumeRoleWithWebIdentity`;
-- Bedrock model discovery: **UNRUN**;
-- paid model invocation: **UNRUN**;
-- AgentCore creation/update: **UNRUN**;
-- any other AWS resource mutation: **UNRUN**.
+A real AgentCore `InvokeAgentRuntime` call returned HTTP 200. The response passed:
 
-The probe PR was closed without merge after the boundary was measured, so the public `main` does not contain a workflow that repeatedly attempts the blocked role.
+```text
+AGENTCORE_RUNTIME_DEPLOYMENT=PASS
+AGENTCORE_LIVE_INVOCATION=PASS
+STRANDS_LOOP_INSIDE_AGENTCORE=PASS
+HUMAN_AUTHORITY_BOUNDARY=PASS
+SAFE_ACTIONS_PRESERVED=5
+REVERSIBLE_EFFECTS_ROLLED_BACK=6
+IRREVERSIBLE_TRANSMIT=INVALIDATED
+FOUNDATION_MODEL_INVOCATION=UNVERIFIED
+```
 
-## Owner-enabled upgrade path
+The runtime response retained:
 
-If AgentCore is pursued before submission, the safe sequence is:
+- `execution=REAL_STRANDS_AGENT_LOOP_DETERMINISTIC_MODEL`;
+- `authority_mutation_tools=[]`;
+- `authority_boundary=EXTERNAL_HUMAN_ONLY`;
+- five safe actions preserved;
+- six reversible protected effects rolled back;
+- pending irreversible transmit invalidated;
+- 14 receipts.
 
-1. create a **dedicated least-privilege GitHub OIDC role** for `moneyparking/evidencebound-authority-cut`, or explicitly extend a suitable role's trust policy to this new repository/ref;
-2. grant only the AgentCore/Bedrock permissions required by the selected Runtime/Identity/Observability path;
-3. verify `sts:GetCallerIdentity` from this repository before any resource mutation;
-4. deploy the exact accepted Authority Cut source revision to AgentCore;
-5. invoke the same vendor-onboarding judge workflow;
-6. verify the external human authority channel remains outside the model tool set;
-7. capture AgentCore Runtime/Identity/Observability evidence only after live acceptance;
-8. retain the current public Vercel path as rollback/reference until AgentCore acceptance is complete.
+See `docs/agentcore-acceptance-2026-08-23.md`.
 
-Do not reuse the old role by assumption. The capability probe has already shown that the new repository identity is not currently authorized.
+## Historical GitHub OIDC boundary
 
-## Kill / rollback criteria
+The earlier non-mutating GitHub OIDC probe remains a valid historical result:
 
-Do not add AgentCore if it:
+- repository path attempted to reuse a pre-existing EvidenceBound deployment role;
+- `sts:AssumeRoleWithWebIdentity`: **BLOCKED**;
+- no AgentCore/resource mutation followed that denial.
 
-- requires weakening the external-human authority boundary;
-- cannot be deployed and smoke-tested before submission;
-- obscures the distinction between pre-existing EvidenceBound work and this new competition implementation;
-- introduces an unstable judge dependency without enough judging upside.
+That role trust was not silently reclassified as working. The successful AgentCore deployment used an owner-authenticated AWS CloudShell path with a dedicated least-privilege execution role.
 
-Rollback remains the current public Strands judge service at `https://evidencebound-authority-cut.vercel.app`.
+## Foundation-model boundary
+
+The accepted AgentCore Runtime uses the same deterministic custom Strands `Model` provider as the public reproducible judge proof. Therefore:
+
+- AgentCore infrastructure execution: **PASS**;
+- Strands orchestration inside AgentCore: **PASS**;
+- foundation-model invocation: **UNVERIFIED**.
+
+Do not infer foundation-model quality or Bedrock model execution from AgentCore acceptance.
+
+## Rollback
+
+The canonical public Vercel judge path remains the stable zero-credential public fallback/reference at:
+
+`https://evidencebound-authority-cut.vercel.app`
+
+AgentCore is a verified deployment surface, not a reason to make the public judge experience depend on AWS credentials.
