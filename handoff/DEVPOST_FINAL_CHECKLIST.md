@@ -1,6 +1,6 @@
-# Authority Cut — Devpost Final Checklist
+# Authority Cut - Devpost Final Checklist
 
-Snapshot: 2026-08-19
+Snapshot updated: 2026-08-23
 
 ## Competition
 
@@ -9,19 +9,19 @@ Snapshot: 2026-08-19
 - submission deadline: **2026-09-14 17:00 PT / 2026-09-15 00:00 UTC**;
 - target prize track: **Professional Agents**;
 - public video: YouTube or Vimeo, maximum **5 minutes**;
-- AWS Builder ID required by the submission flow;
+- AWS Builder ID required;
 - public source repository required;
 - README + architecture documentation required;
-- MIT or Apache license required — Authority Cut uses **Apache-2.0**;
+- MIT or Apache license required - Authority Cut uses **Apache-2.0**;
 - pre-existing work must be disclosed.
 
 ## Canonical submission links
 
-**Public repository**
+Repository:
 
 `https://github.com/moneyparking/evidencebound-authority-cut`
 
-**Public functional judge URL**
+Public functional judge URL:
 
 `https://evidencebound-authority-cut.vercel.app`
 
@@ -31,41 +31,75 @@ Snapshot: 2026-08-19
 - real Strands SDK Agent loop: **PASS**
 - real tool execution: **PASS**
 - one deep professional workflow: **PASS**
-- selective external human intervention: **PASS**
+- selective external human intervention boundary: **PASS**
 - human correction changes downstream execution: **PASS**
 - reversible recovery/compensation: **PASS**
 - irreversible-effect gating: **PASS**
 - provenance/receipts: **PASS**
 - public repo: **PASS**
-- public CI: **PASS**
+- public baseline CI: **PASS**
 - public judge URL: **PASS**
 - Apache-2.0 license: **PASS**
 - pre-existing-work disclosure: **PASS**
-- foundation-model execution: **UNRUN / optional score upgrade**
-- AgentCore deployment: **UNRUN / optional score upgrade**
+- Amazon Bedrock AgentCore Runtime deployment: **PASS**
+- AgentCore live invocation: **PASS**
+- real Strands loop inside AgentCore: **PASS**
+- foundation-model execution: **UNVERIFIED / optional**
+
+## AgentCore acceptance
+
+Verified 2026-08-23:
+
+- region: `eu-central-1`
+- Runtime: `AuthorityCutRuntime`, version `1`
+- status: `READY`
+- direct-code / S3 CodeZip
+- Python: `PYTHON_3_13`
+- entry point: `agentcore_main.py`
+- packaged source HEAD: `200d71f963bb4496a6f01a6cf1788695b3164739`
+- CodeZip SHA-256: `67c9ce7de97f48970d3c595e6914fef314011fa5cebccf4f01cd4b6bea32690e`
+- `InvokeAgentRuntime`: HTTP 200
+- Strands loop inside AgentCore: PASS
+- `authority_mutation_tools=[]`: PASS
+- `authority_boundary=EXTERNAL_HUMAN_ONLY`: PASS
+- safe actions preserved: 5
+- reversible protected effects rolled back: 6
+- irreversible transmit: `INVALIDATED`
+- foundation-model invocation: `UNVERIFIED`
+
+See `docs/agentcore-acceptance-2026-08-23.md`.
 
 ## Judge test path
 
 1. Open `https://evidencebound-authority-cut.vercel.app`.
-2. Verify the page states the truth boundary: real Strands loop; deterministic custom Model; foundation model and AgentCore unverified.
-3. Select **Run live Strands judge path**.
-4. Confirm five safe actions execute and `vendor-risk` is the only ready authority initially.
-5. Confirm model-callable tools contain no approve/revoke function.
-6. Inspect the next phase after the external `vendor-risk` grant.
-7. Inspect `payment-release` and then `first-funds` readiness.
-8. Confirm irreversible `transmit` remains blocked before first-funds authority.
-9. Inspect the correction phase: six protected reversible effects `ROLLED_BACK`, transmit `INVALIDATED`, five safe actions preserved.
+2. Select **Run live Strands judge path**.
+3. Confirm the response identifies `REAL_STRANDS_AGENT_LOOP_DETERMINISTIC_MODEL`.
+4. Confirm the published model-callable tools contain no approve/revoke function.
+5. Confirm five safe actions execute before protected work.
+6. Confirm `vendor-risk` is initially ready while future authorities are not ready.
+7. Inspect the vendor-risk and payment-release phases.
+8. Confirm `first-funds` becomes ready only after remittance preview while transmit remains blocked.
+9. Inspect human correction: six protected reversible effects `ROLLED_BACK`, transmit `INVALIDATED`, five safe actions preserved.
 10. Cross-check `/api/tool-boundary` and `/api/evaluation` if desired.
+11. For AWS deployment evidence, inspect `docs/agentcore-acceptance-2026-08-23.md`.
 
 ## Stage Two judging mapping
 
 ### Technical Implementation
 
-Lead with live Strands execution + external human authority boundary + correction propagation. Do not lead with optional AgentCore.
+Lead with:
+
+- authentic Strands execution;
+- explicit external-human authority boundary;
+- correction propagation;
+- verified AgentCore Runtime deployment/invocation;
+- public CI and public judge path.
+
+Do not imply that AgentCore acceptance proves foundation-model execution.
 
 ### Design
 
-Show the decision surface: routine work is autonomous; only currently actionable semantic authority is escalated; future decisions stay hidden/not-ready.
+Show the decision surface: routine work is autonomous; only currently actionable semantic authority is escalated; future decisions remain not-ready until prerequisite evidence exists.
 
 ### Potential Impact
 
@@ -73,65 +107,70 @@ Describe professional operations use cases. Keep the 57.14% reduction explicitly
 
 ### Creativity & Originality
 
-Use the invention thesis **Authority Cut Sets + Reversible Correction Propagation** and disclose overlap with HITL, provenance, dependency invalidation and compensation patterns.
+Use the invention thesis **Authority Cut Sets + Reversible Correction Propagation**. Explicitly disclose overlap with existing HITL, interrupt/resume, delegated authorization, dependency invalidation and compensation patterns.
 
 ### Presentation
 
-Spend video time on the four-phase live proof, not infrastructure setup.
+Show real working execution. The final video should include the recorded click on **Run live Strands judge path** and the returned live states. Include AgentCore verification briefly as production-depth evidence, not as the main story.
 
-## Video capture checklist
+## Video checklist
 
-- [ ] Problem statement: too many interruptions vs silent authority accumulation.
-- [ ] Show public URL and repo identity.
-- [ ] Show exact Strands tool list; highlight no approve/revoke tool.
-- [ ] Run live proof: safe work.
-- [ ] Show initial Authority Cut readiness.
-- [ ] Show external vendor-risk grant and authorized resume.
-- [ ] Show payment-release grant and remittance preview.
-- [ ] Show first-funds ready while transmit remains blocked.
-- [ ] Revoke vendor-risk.
-- [ ] Show six rollbacks, transmit invalidated, five safe actions preserved.
-- [ ] Show evidence/receipts/public CI briefly.
-- [ ] State limitations: deterministic live model provider, no AgentCore claim, fixed-workflow metrics only.
-- [ ] Keep final published video <=5 minutes and public on YouTube/Vimeo.
+- [x] Problem statement: too many interruptions vs silent authority accumulation.
+- [x] Who it is for: procurement / finance / compliance / operations.
+- [x] Strands tool boundary explained.
+- [x] Fixed-workflow evaluation explained.
+- [x] Matthew narration produced.
+- [x] Real public live Strands capture recorded.
+- [x] Verified AgentCore Runtime acceptance obtained.
+- [ ] Final edit embeds the real live Strands capture.
+- [ ] Final edit includes a concise verified AgentCore proof segment.
+- [ ] Final edit states `FOUNDATION_MODEL_INVOCATION=UNVERIFIED`.
+- [ ] Final published video <=5 minutes.
+- [ ] Video published **Public** on YouTube/Vimeo.
 
 ## Form / identity actions
 
-- [ ] Confirm hackathon registration / official rules acceptance if not already completed.
-- [ ] Confirm AWS Builder ID for the entrant.
-- [ ] Add project name `Authority Cut`.
-- [ ] Add public repository URL.
-- [ ] Add public functional judge URL.
-- [ ] Add public video URL.
-- [ ] Add architecture diagram / architecture description as requested by the form.
-- [ ] Include pre-existing-work disclosure from `docs/preexisting-work.md`.
-- [ ] Ensure all written claims match `AWS_JUDGE_PACK.md`, `docs/claims-ledger.md`, and `qa/QA_RECEIPT.json`.
-- [ ] Final Devpost submission remains an owner action.
+- [x] Hackathon registration completed.
+- [x] AWS Builder ID available.
+- [x] Devpost project shell `Authority Cut` exists.
+- [x] Project description / built-with / repo / live judge link prepared.
+- [ ] Upload final architecture diagram in the required Devpost field.
+- [ ] Add final public video URL.
+- [ ] Ensure Professional Agents is selected.
+- [ ] Include pre-existing-work disclosure.
+- [ ] Read back all written claims against `docs/claims-ledger.md` and `AWS_JUDGE_PACK.md`.
+- [ ] Submit.
+- [ ] Live submitted readback.
 
-## Optional score upgrades — not required for READY
+## Foundation-model boundary
 
-### AWS promotional credits
+Current status:
 
-Registered participants may request the current competition AWS promotional credit while supplies remain available. Current organizer deadline: **2026-09-11 12:00 PT**.
+- provider adapter/contract: **PASS**;
+- actual foundation-model invocation: **UNVERIFIED / UNRUN**.
 
-Use only if pursuing verified AWS/AgentCore work; do not request credits merely for a logo/checkbox.
+The accepted AgentCore deployment uses the deterministic custom Strands `Model` provider. Do not add a foundation-model claim merely because AgentCore is now verified.
 
-### AgentCore
+## Historical AWS identity boundary
 
-Current blocker: `BLOCKED_AWS_OIDC_TRUST`.
+The pre-existing EvidenceBound GitHub OIDC role still does not trust this competition repository identity. That earlier probe remains `BLOCKED_AWS_OIDC_TRUST`.
 
-Owner action: create/extend a least-privilege GitHub OIDC trust for `moneyparking/evidencebound-authority-cut`, then verify STS identity before any resource mutation.
+The verified AgentCore Runtime was deployed through an independently authenticated owner CloudShell path with a dedicated least-privilege Runtime role.
 
-### Foundation-model acceptance
+## builder.aws bonus
 
-Current blocker: `BLOCKED_RUNTIME_GATEWAY_CREDENTIAL`.
+Three technically substantive draft posts already exist in `handoff/BUILDER_AWS_BONUS_POSTS.md`.
 
-Provider adapter and fail-closed contract are already PASS. Actual invocation stays UNRUN until a supported runtime credential exists.
-
-### builder.aws bonus content
-
-If pursuing the current content bonus, produce only technically substantive posts that document the actual mechanism/evidence. Do not let bonus-content work displace the final video/submission or destabilize the live demo.
+If the current bonus remains available under the final rules readback, publish up to three qualifying posts only after the main submission package is stable. Do not delay required submission work for bonus content.
 
 ## Final status
 
-**READY** — required engineering and live judge path are complete. Remaining required work is registration/identity verification if needed, final media, Devpost form completion and submission.
+**READY engineering / NOT YET SUBMITTED.**
+
+Remaining critical path:
+
+1. final video edit with live Strands + concise AgentCore evidence;
+2. publish video Public;
+3. upload architecture file;
+4. final Devpost write/readback;
+5. submit and verify `submitted` state.
