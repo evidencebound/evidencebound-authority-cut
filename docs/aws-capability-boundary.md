@@ -1,60 +1,80 @@
 # Authority Cut — AWS Capability Boundary
 
-Snapshot: 2026-08-19
+Snapshot updated: 2026-08-23
 
 ## Purpose
 
-Measure whether the new Authority Cut repository can reuse an existing EvidenceBound GitHub OIDC deployment role **without mutating AWS resources or making paid model calls**.
+Keep separate two AWS facts that must not be conflated:
 
-## Candidate identity
+1. whether the new Authority Cut repository can reuse a pre-existing EvidenceBound GitHub OIDC role; and
+2. whether Authority Cut itself can be deployed and invoked on Amazon Bedrock AgentCore Runtime through an independently authenticated owner path.
 
-- AWS account: `877348951762`
-- candidate role: `arn:aws:iam::877348951762:role/EvidenceBoundGitHubDeployRole`
-- repository identity under test: `moneyparking/evidencebound-authority-cut`
+## Historical GitHub OIDC probe
 
-The role ARN is deployment metadata, not a secret.
+A non-mutating GitHub Actions capability probe attempted to reuse a pre-existing EvidenceBound deployment role from the new repository identity `moneyparking/evidencebound-authority-cut`.
 
-## Canonical probe
+Canonical probe:
 
-- GitHub Actions run: `32219855151`
-- operation: GitHub OIDC -> `sts:AssumeRoleWithWebIdentity`
-- retry attempts capped to 3 in the final probe revision
-- result: **BLOCKED**
-- observed AWS error class/message: `Not authorized to perform sts:AssumeRoleWithWebIdentity`
+- GitHub Actions run: `32219855151`;
+- operation: GitHub OIDC -> `sts:AssumeRoleWithWebIdentity`;
+- result: **BLOCKED**;
+- observed AWS error: `Not authorized to perform sts:AssumeRoleWithWebIdentity`.
 
-Because STS authentication failed, the workflow deliberately did not continue to any AWS capability that might create cost or mutate infrastructure.
+Because authentication failed, the workflow intentionally stopped before any resource mutation or paid model request.
 
-## Exact downstream statuses
+Correct historical statuses:
 
-- STS role assumption: **BLOCKED_AWS_OIDC_TRUST**
-- `sts:GetCallerIdentity`: **UNRUN**
-- Bedrock model discovery: **UNRUN**
-- Bedrock/foundation-model invocation: **UNRUN**
-- AgentCore Runtime creation: **UNRUN**
-- AgentCore Identity/Observability setup: **UNRUN**
-- CloudFormation/resource mutation: **UNRUN**
-- paid AWS operation intentionally initiated by the probe: **UNRUN**
+- reuse of the probed GitHub OIDC role: **BLOCKED_AWS_OIDC_TRUST**;
+- Bedrock/foundation-model invocation through that probe: **UNRUN**;
+- AgentCore creation/update through that probe: **UNRUN**.
 
-The probe PR was closed without merge after the capability boundary was measured, so the public `main` is not burdened with a repeatedly failing AWS workflow.
+This blocker was not rewritten as PASS.
+
+## Verified owner-authenticated AgentCore path
+
+On 2026-08-23 the project was deployed through authenticated AWS CloudShell using a dedicated least-privilege Runtime execution role.
+
+Accepted configuration:
+
+- region: `eu-central-1`;
+- Runtime name: `AuthorityCutRuntime`;
+- Runtime version: `1`;
+- Runtime status: `READY`;
+- direct-code S3 CodeZip;
+- `PYTHON_3_13`;
+- entry point `agentcore_main.py`;
+- network mode `PUBLIC`;
+- source HEAD packaged: `200d71f963bb4496a6f01a6cf1788695b3164739`;
+- CodeZip SHA-256: `67c9ce7de97f48970d3c595e6914fef314011fa5cebccf4f01cd4b6bea32690e`.
+
+A real `InvokeAgentRuntime` call returned HTTP 200 and the response passed all Authority Cut acceptance assertions:
+
+```text
+AGENTCORE_RUNTIME_DEPLOYMENT=PASS
+AGENTCORE_LIVE_INVOCATION=PASS
+STRANDS_LOOP_INSIDE_AGENTCORE=PASS
+HUMAN_AUTHORITY_BOUNDARY=PASS
+SAFE_ACTIONS_PRESERVED=5
+REVERSIBLE_EFFECTS_ROLLED_BACK=6
+IRREVERSIBLE_TRANSMIT=INVALIDATED
+FOUNDATION_MODEL_INVOCATION=UNVERIFIED
+```
+
+Public documentation omits AWS account, role and bucket identifiers.
 
 ## Interpretation
 
-This is not a failure of Authority Cut or Strands. It is an external deployment-identity boundary: the new competition repository is not authorized by the probed role's trust configuration.
+The earlier GitHub OIDC denial was an identity/trust limitation of one deployment path, not a limitation of AgentCore or Authority Cut.
 
-Do not infer that the old EvidenceBound deployment role is reusable simply because it exists in the same AWS account.
+The accepted CloudShell deployment proves that the same Authority Cut Strands control semantics execute inside AgentCore Runtime without granting model-callable approve/revoke capabilities.
 
-## Owner action for optional AgentCore upgrade
+Correct current statuses:
 
-If AgentCore is pursued before submission:
+- public Strands judge path: **PASS**;
+- AgentCore Runtime deployment: **PASS**;
+- AgentCore data-plane invocation: **PASS**;
+- Strands loop inside AgentCore: **PASS**;
+- foundation-model invocation: **UNVERIFIED**;
+- historical reuse of pre-existing GitHub OIDC role: **BLOCKED_AWS_OIDC_TRUST**.
 
-1. create a dedicated least-privilege GitHub OIDC role for this repository, or explicitly extend an appropriate role's trust policy to `moneyparking/evidencebound-authority-cut` and the intended ref/environment;
-2. verify `sts:GetCallerIdentity` from this repository first;
-3. grant only the required Bedrock AgentCore Runtime/Identity/Observability and model permissions;
-4. deploy the exact accepted public source revision;
-5. run the complete vendor-onboarding live judge path;
-6. preserve the external-human approve/revoke boundary;
-7. capture AgentCore evidence only after live acceptance.
-
-## Submission classification
-
-AgentCore is an **optional score upgrade** and currently **BLOCKED_AWS_OIDC_TRUST**. The project itself remains READY through the accepted public Strands execution path.
+See `docs/agentcore-acceptance-2026-08-23.md`.
