@@ -25,7 +25,7 @@ Public judge URL:
 
 Public repository:
 
-`https://github.com/moneyparking/evidencebound-authority-cut`
+`https://github.com/evidencebound/evidencebound-authority-cut`
 
 ## Competition contribution
 
