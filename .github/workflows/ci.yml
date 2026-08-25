@@ -57,7 +57,7 @@ jobs:
           python-version: '3.13'
       - run: python -m pip install -e '.[agentcore,dev]'
       - name: Execute AgentCore entrypoint through real Strands SDK loop
-        run: PYTHONPATH=src python scripts/run_agentcore_contract_probe.py
+        run: PYTHONPATH=.:src python scripts/run_agentcore_contract_probe.py
       - run: python -m compileall -q src tests scripts agentcore_main.py
   gateway-contract:
     runs-on: ubuntu-latest
