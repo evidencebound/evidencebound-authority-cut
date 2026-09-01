@@ -41,6 +41,10 @@ def _validate_bedrock_config(*, model_id: str, region: str) -> None:
         raise RuntimeError("Bedrock model/region configuration unavailable; fail closed")
     if region != DEFAULT_BEDROCK_REGION:
         raise RuntimeError("Bedrock region must be eu-central-1; fail closed")
+    if model_id != DEFAULT_BEDROCK_MODEL_ID:
+        raise RuntimeError(
+            f"Bedrock model must be {DEFAULT_BEDROCK_MODEL_ID}; fail closed"
+        )
 
 
 def build_bedrock_agent(*, model_id: str, region: str):
@@ -117,7 +121,7 @@ def run_foundation_model_acceptance(
     region: str,
     require_model_metrics: bool,
 ) -> dict[str, Any]:
-    """Exercise the full Authority Cut workflow around three model-driven Strands turns."""
+    """Exercise Authority Cut control semantics without promoting a real-model claim."""
     plane = get_plane(reset=True)
     phases: list[dict[str, Any]] = []
     model_receipts: list[dict[str, Any]] = []
@@ -233,7 +237,7 @@ def run_foundation_model_acceptance(
         raise AssertionError("three distinct model response receipts are required")
 
     return {
-        "execution": "REAL_STRANDS_AGENT_LOOP_FOUNDATION_MODEL",
+        "execution": "FOUNDATION_MODEL_CONTROL_CONTRACT_ONLY",
         "provider": provider,
         "model_id": model_id,
         "region": region,
@@ -243,13 +247,43 @@ def run_foundation_model_acceptance(
         "safe_actions_preserved": 5,
         "protected_reversible_effects_rolled_back": 6,
         "irreversible_transmit_after_correction": plane.state.status["transmit"].value,
-        "foundation_model_invocation": "PASS",
+        "foundation_model_invocation": "UNVERIFIED",
+        "acceptance_mode": "CONTROL_CONTRACT_ONLY",
         "agentcore": "UNVERIFIED",
         "model_response_receipts": model_receipts,
         "affected_after_correction": sorted(affected),
         "receipt_count": len(plane.state.receipts),
         "phases": phases,
     }
+
+
+def _promote_verified_bedrock_result(
+    result: dict[str, Any], *, model_id: str, region: str
+) -> dict[str, Any]:
+    """Promote only a usage-bearing native Bedrock result to the real-model claim."""
+    receipts = result.get("model_response_receipts")
+    if not isinstance(receipts, list) or len(receipts) != 3:
+        raise AssertionError("exactly three Bedrock model response receipts are required")
+    hashes = {receipt.get("sha256") for receipt in receipts if isinstance(receipt, dict)}
+    if len(hashes) != 3 or None in hashes:
+        raise AssertionError("three distinct Bedrock response hashes are required")
+    for receipt in receipts:
+        usage = receipt.get("usage") if isinstance(receipt, dict) else None
+        if not isinstance(usage, dict) or usage.get("totalTokens", 0) <= 0:
+            raise AssertionError("positive Bedrock model usage is required for PASS")
+
+    promoted = dict(result)
+    promoted.update(
+        {
+            "execution": "REAL_STRANDS_AGENT_LOOP_FOUNDATION_MODEL",
+            "provider": "AMAZON_BEDROCK",
+            "model_id": model_id,
+            "region": region,
+            "foundation_model_invocation": "PASS",
+            "acceptance_mode": "REAL_NATIVE_BEDROCK",
+        }
+    )
+    return promoted
 
 
 def run_bedrock_strands_proof(
@@ -262,10 +296,11 @@ def run_bedrock_strands_proof(
     if not _aws_credentials_available():
         raise RuntimeError("AWS credentials unavailable; fail closed")
     agent = build_bedrock_agent(model_id=model_id, region=region)
-    return run_foundation_model_acceptance(
+    result = run_foundation_model_acceptance(
         agent,
         provider="AMAZON_BEDROCK",
         model_id=model_id,
         region=region,
         require_model_metrics=True,
     )
+    return _promote_verified_bedrock_result(result, model_id=model_id, region=region)
