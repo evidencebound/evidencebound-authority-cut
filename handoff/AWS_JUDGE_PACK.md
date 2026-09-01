@@ -1,12 +1,14 @@
 # AWS Agents for Humans - Final Submission Handoff
 
-Snapshot updated: 2026-08-23
+Snapshot updated: 2026-09-01
 
 ## Decision
 
-**READY engineering / NOT YET SUBMITTED.**
+**READY engineering.**
 
-Authority Cut is the Professional Agents submission candidate. The core public Strands path is independently verifiable, and Amazon Bedrock AgentCore Runtime is now also verified through a real deployment and live invocation.
+Authority Cut is the Professional Agents submission candidate. The public deterministic Strands judge path is independently verifiable, Amazon Bedrock AgentCore Runtime deployment/invocation is verified, and a separate native Amazon Bedrock / Amazon Nova Lite foundation-model-backed Strands acceptance is now also verified.
+
+This evidence pass does not independently read back or modify the Devpost submission state.
 
 ## Identity
 
@@ -20,11 +22,17 @@ Authority Cut is the Professional Agents submission candidate. The core public S
 
 Public repository:
 
-`https://github.com/moneyparking/evidencebound-authority-cut`
+`https://github.com/evidencebound/evidencebound-authority-cut`
 
 Public judge URL:
 
 `https://evidencebound-authority-cut.vercel.app`
+
+Video:
+
+`https://youtu.be/dY8W-AP4mms`
+
+Do not replace the video solely for the later Bedrock acceptance.
 
 ## Memorable judge hook
 
@@ -42,7 +50,7 @@ Open the public URL and select **Run live Strands judge path**.
 
 The production service executes the real Strands SDK Agent/tool loop against a reset-each-call synthetic vendor-onboarding workflow. It does not replay a saved result.
 
-Accepted live result:
+Accepted public live result:
 
 ```text
 execution = REAL_STRANDS_AGENT_LOOP_DETERMINISTIC_MODEL
@@ -60,19 +68,55 @@ irreversible_transmit_after_correction = INVALIDATED
 receipt_count = 14
 ```
 
+The public route intentionally stays deterministic and credential-free.
+
+## Native Amazon Bedrock / Nova Lite - VERIFIED
+
+Accepted 2026-09-01 through owner-authenticated AWS CloudShell at exact source:
+
+`9998565c6db8083446caef7e20a6cf03601533e6`
+
+Configuration/readback:
+
+- region: `eu-central-1`;
+- inference profile: `eu.amazon.nova-lite-v1:0`;
+- status: `ACTIVE`;
+- type: `SYSTEM_DEFINED`;
+- target model count: 4;
+- native Strands `BedrockModel`;
+- same exact three non-authorizing model tools;
+- human grant/revocation outside the model tool surface.
+
+Independent direct runtime probe:
+
+```text
+DIRECT_CONVERSE=PASS
+STOP_REASON=end_turn
+INPUT_TOKENS=8
+OUTPUT_TOKENS=5
+TOTAL_TOKENS=13
+```
+
+Full Strands Authority Cut result:
+
+```text
+AUTHORITY_CUT_BEDROCK=PASS
+EXECUTION=REAL_STRANDS_AGENT_LOOP_FOUNDATION_MODEL
+FOUNDATION_MODEL_INVOCATION=PASS
+```
+
+The fail-closed promotion gate requires three distinct model-response SHA-256 receipts with positive token usage and all control/correction invariants before PASS can be returned.
+
+See:
+
+- `docs/bedrock-foundation-model-acceptance-2026-09-01.md`
+- `handoff/BEDROCK_FOUNDATION_MODEL_ADDENDUM.md`
+
 ## Deep professional workflow
 
 ### Phase 1 - autonomous safe work
 
-Five routine actions execute before human attention:
-
-1. collect vendor packet;
-2. tax check;
-3. bank check;
-4. draft vendor record;
-5. follow-up preparation.
-
-Protected activation remains blocked. `vendor-risk` is ready; later authorities are not ready.
+Five routine actions execute before human attention. Protected activation remains blocked. `vendor-risk` is ready; later authorities are not ready.
 
 ### Phase 2 - vendor-risk authority
 
@@ -86,7 +130,7 @@ The external principal grants `payment-release`. Payment-profile, terms and remi
 
 The principal revokes the earlier `vendor-risk` authority.
 
-Observed state:
+Observed canonical state:
 
 - 6 reversible protected effects -> `ROLLED_BACK`;
 - pending irreversible transmit -> `INVALIDATED`;
@@ -126,40 +170,19 @@ Accepted 2026-08-23 through owner-authenticated AWS CloudShell.
 
 Configuration:
 
-- region: `eu-central-1` (Frankfurt)
-- Runtime: `AuthorityCutRuntime`, version `1`
-- status: `READY`
-- direct-code / S3 CodeZip
-- runtime: `PYTHON_3_13`
-- entry point: `agentcore_main.py`
-- network mode: `PUBLIC`
-- packaged source HEAD: `200d71f963bb4496a6f01a6cf1788695b3164739`
-- CodeZip SHA-256: `67c9ce7de97f48970d3c595e6914fef314011fa5cebccf4f01cd4b6bea32690e`
+- region: `eu-central-1`;
+- Runtime: `AuthorityCutRuntime`, version `1`;
+- status: `READY`;
+- direct-code / S3 CodeZip;
+- runtime: `PYTHON_3_13`;
+- entry point: `agentcore_main.py`;
+- network mode: `PUBLIC`;
+- packaged source HEAD: `200d71f963bb4496a6f01a6cf1788695b3164739`;
+- CodeZip SHA-256: `67c9ce7de97f48970d3c595e6914fef314011fa5cebccf4f01cd4b6bea32690e`.
 
-Real `InvokeAgentRuntime` returned HTTP 200 and passed:
+Real `InvokeAgentRuntime` returned HTTP 200 and passed the Strands loop and authority/correction assertions.
 
-```text
-AGENTCORE_RUNTIME_DEPLOYMENT=PASS
-AGENTCORE_LIVE_INVOCATION=PASS
-STRANDS_LOOP_INSIDE_AGENTCORE=PASS
-HUMAN_AUTHORITY_BOUNDARY=PASS
-SAFE_ACTIONS_PRESERVED=5
-REVERSIBLE_EFFECTS_ROLLED_BACK=6
-IRREVERSIBLE_TRANSMIT=INVALIDATED
-FOUNDATION_MODEL_INVOCATION=UNVERIFIED
-```
-
-The accepted AgentCore Runtime uses the same deterministic custom Strands `Model` provider as the public reproducible proof. Therefore AgentCore infrastructure execution is PASS while foundation-model invocation remains UNVERIFIED.
-
-See `docs/agentcore-acceptance-2026-08-23.md`.
-
-## Historical AWS identity boundary
-
-An earlier non-mutating GitHub OIDC probe attempted to reuse a pre-existing EvidenceBound deployment role from the new competition repository identity and received `Not authorized to perform sts:AssumeRoleWithWebIdentity`.
-
-That specific reuse path remains `BLOCKED_AWS_OIDC_TRUST`. It was not silently converted to PASS.
-
-The successful AgentCore deployment used an independently authenticated CloudShell path and a dedicated least-privilege Runtime role.
+Important historical boundary: that AgentCore Runtime used the deterministic custom Strands provider. Its recorded `FOUNDATION_MODEL_INVOCATION=UNVERIFIED` remains correct for that historical invocation. The 2026-09-01 native Bedrock acceptance is a distinct execution path.
 
 ## Current judging-criterion mapping
 
@@ -170,6 +193,7 @@ Lead evidence:
 - authentic Strands Agent/tool orchestration;
 - exact restricted tool boundary;
 - real public execution;
+- real native Bedrock / Nova Lite foundation-model execution;
 - prerequisite/receipt-gated semantic authority;
 - downstream correction propagation and compensation;
 - separate irreversible authority;
@@ -195,10 +219,6 @@ The strongest competition contribution is the concrete composition of:
 
 Do not claim invention of HITL, interrupt/resume, revocable authorization, provenance, dependency invalidation or compensation generally.
 
-### Presentation
-
-The final video should show the real click on **Run live Strands judge path**, the returned live ledger, and a short AgentCore acceptance proof. Do not spend the demo on deployment commands.
-
 ## Prior-art boundary
 
 Current Strands already provides HITL interventions, approval interception and interrupt/resume. Agent governance, delegated authority and transactional/compensation patterns also predate this project.
@@ -215,47 +235,30 @@ Pre-existing EvidenceBound concepts include provenance/evidence binding, depende
 
 This AWS competition repository was created during the submission period. Its vendor-onboarding graph, Authority Cut mechanism, Strands orchestration, evaluation, AgentCore adapter and public judge service are competition-period work. No source file from EvidenceBound Core, Recovery Mesh, Verified Memory, DataHub Gate or SignalReview was copied into this project.
 
-## Foundation-model boundary
+## Historical provider/identity boundaries
 
-Status:
+- historical optional Vercel AI Gateway provider contract: **PASS**;
+- historical Vercel AI Gateway model invocation: **UNRUN**;
+- historical reuse of a pre-existing EvidenceBound GitHub OIDC role: `BLOCKED_AWS_OIDC_TRUST`;
+- native Amazon Bedrock / Nova Lite foundation-model acceptance: **PASS**.
 
-- optional Strands OpenAI-compatible provider contract: **PASS**;
-- actual foundation-model invocation: **UNVERIFIED / UNRUN**.
+Do not rewrite historical failed/unrun paths as PASS.
 
-Do not infer foundation-model execution from the deterministic public proof or AgentCore acceptance.
+## Submission-safe technical patch
 
-## Competition / compliance essentials
+If written Devpost fields can still be edited without jeopardizing submission state, a concise verified addition is:
 
-Preserve in final submission:
+> Additional production-depth acceptance: the same three-tool Strands Authority Cut workflow was executed with Amazon Nova Lite through native Amazon Bedrock in eu-central-1. Direct Bedrock Runtime Converse passed, and the full Strands workflow returned `REAL_STRANDS_AGENT_LOOP_FOUNDATION_MODEL` with `FOUNDATION_MODEL_INVOCATION=PASS` while approve/revoke remained outside the model tool surface. The public judge URL intentionally remains deterministic and credential-free.
 
-- Strands architecturally central;
-- new project during competition period;
-- public source repository;
-- README + architecture documentation;
-- Apache-2.0 license;
-- public demo/testing path;
-- public YouTube/Vimeo demo <=5 minutes;
-- AWS Builder ID;
-- pre-existing-work disclosure;
-- Professional Agents track.
-
-## Remaining critical path
-
-1. final video edit: real public Strands run + concise AgentCore proof;
-2. publish video **Public** on YouTube/Vimeo;
-3. upload architecture diagram to Devpost;
-4. final Devpost write/readback;
-5. submit;
-6. verify live submitted state.
-
-Optional after submission stability: publish up to three technically substantive qualifying `builder.aws` posts if the current rules still award the bonus.
+Do not replace the existing video and do not claim the video demonstrates this later acceptance.
 
 ## Final classification
 
-**READY engineering / NOT YET SUBMITTED.**
+**READY engineering.**
 
 Verified limitations:
 
-- foundation-model execution: **UNVERIFIED**;
 - real customer productivity/adoption: **UNVERIFIED**;
-- arbitrary external-system compensation safety: **UNVERIFIED**.
+- arbitrary external-system compensation safety: **UNVERIFIED**;
+- general corrigibility/alignment claim: **NOT CLAIMED**;
+- independent Devpost live readback in this evidence pass: **UNRUN**.

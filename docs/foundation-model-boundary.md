@@ -1,80 +1,145 @@
 # Authority Cut — Foundation-Model Acceptance Boundary
 
-Snapshot: 2026-08-19
+Snapshot: 2026-09-01
 
 ## Objective
 
-Test whether the exact Authority Cut tool/control boundary can be driven by a real foundation model without giving the model any approve/revoke capability and without exposing a paid model endpoint on the public judge service.
+Verify that the exact Authority Cut tool/control boundary can be driven by a real foundation model without giving the model approve/revoke capability and without replacing the credential-free deterministic public judge path.
 
-## Prepared provider path
+## Current decision
 
-The optional adapter uses:
+**Native Amazon Bedrock / Amazon Nova Lite: VERIFIED / PASS.**
+
+**Historical optional Vercel AI Gateway path: provider contract PASS; actual Gateway model invocation UNRUN.**
+
+These are separate provider paths and must not be conflated.
+
+## Native Amazon Bedrock path — VERIFIED
+
+Accepted 2026-09-01 through owner-authenticated AWS CloudShell.
+
+Exact accepted source:
+
+`9998565c6db8083446caef7e20a6cf03601533e6`
+
+Configuration:
+
+- provider: native Amazon Bedrock;
+- Strands: `strands-agents==1.52.0`;
+- model inference profile: `eu.amazon.nova-lite-v1:0`;
+- region: `eu-central-1`;
+- temperature: `0.0`;
+- same exact three non-authorizing Authority Cut tools;
+- external `ControlPlane.decide()` / revocation calls for human authority.
+
+AWS control-plane preflight returned:
+
+```text
+AWS_IDENTITY=PASS
+model_id=eu.amazon.nova-lite-v1:0
+status=ACTIVE
+type=SYSTEM_DEFINED
+model_count=4
+```
+
+An independent direct Bedrock Runtime `Converse` probe then returned:
+
+```text
+DIRECT_CONVERSE=PASS
+STOP_REASON=end_turn
+INPUT_TOKENS=8
+OUTPUT_TOKENS=5
+TOTAL_TOKENS=13
+```
+
+The full model-backed Strands workflow then returned:
+
+```text
+AUTHORITY_CUT_BEDROCK=PASS
+EXECUTION=REAL_STRANDS_AGENT_LOOP_FOUNDATION_MODEL
+FOUNDATION_MODEL_INVOCATION=PASS
+```
+
+The model used only the three published tools:
+
+1. `execute_safe_vendor_work`
+2. `get_authority_cut`
+3. `execute_authorized_vendor_work`
+
+Approve/revoke remained outside the model-callable surface. External human grants were introduced between model turns by the control plane.
+
+## Fail-closed promotion conditions
+
+The native Bedrock implementation promotes a result to `REAL_STRANDS_AGENT_LOOP_FOUNDATION_MODEL` only after the workflow proves:
+
+- exact provider/model/region configuration;
+- three model response receipts for `safe`, `vendor-risk`, and `payment-release`;
+- three distinct SHA-256 response digests;
+- positive model token usage on every turn;
+- `authority_mutation_tools=[]`;
+- `authority_boundary=EXTERNAL_HUMAN_ONLY`;
+- 5 unrelated safe actions remain executed;
+- 6 executed reversible protected effects roll back after correction;
+- irreversible transmit becomes `INVALIDATED`;
+- first-funds transmit does not execute without separate authority.
+
+The observed PASS therefore crossed the real-model truth boundary rather than merely constructing a provider object.
+
+See `docs/bedrock-foundation-model-acceptance-2026-09-01.md`.
+
+## Canonical public judge path remains deterministic
+
+The public Vercel judge service intentionally continues to use the deterministic custom Strands `Model` provider.
+
+That path remains the reproducible, credential-free proof of the control semantics and should continue to identify itself as:
+
+`REAL_STRANDS_AGENT_LOOP_DETERMINISTIC_MODEL`
+
+The verified Bedrock acceptance is an additional production-depth proof, not a replacement for the public judge path.
+
+## Historical AgentCore boundary
+
+The 2026-08-23 AgentCore Runtime acceptance proved real AgentCore deployment, real `InvokeAgentRuntime` HTTP 200, and a real Strands loop inside AgentCore.
+
+That historical Runtime used the deterministic custom Strands provider. Therefore its recorded `FOUNDATION_MODEL_INVOCATION=UNVERIFIED` remains historically correct.
+
+The later 2026-09-01 native Bedrock acceptance does not rewrite that older execution record.
+
+## Historical optional Vercel AI Gateway path
+
+An earlier optional provider adapter used:
 
 - Strands `OpenAIModel`;
 - pinned `strands-agents[openai]==1.52.0`;
-- OpenAI-compatible gateway base URL `https://ai-gateway.vercel.sh/v1`;
-- configured low-cost acceptance model `alibaba/qwen3.5-flash`;
-- the same exact three non-authorizing Authority Cut tools;
-- external `ControlPlane.decide()` / revocation calls for human authority.
+- OpenAI-compatible Vercel AI Gateway;
+- the same three Authority Cut tools.
 
-The adapter returns `foundation_model_invocation=PASS` only after all workflow state assertions pass. It never converts a provider response into a grant of authority.
-
-## Public CI contract — PASS
-
-Canonical CI run: `32220265475`.
-
-Verified:
-
-- `strands-agents[openai]==1.52.0` installs: **PASS**;
-- `OpenAIModel` imports: **PASS**;
-- gateway/model configuration contract: **PASS**;
-- protected-preview health contract: **PASS**;
-- missing runtime credential fails closed before provider/network execution: **PASS**;
-- existing deterministic/live Strands proof remains **PASS**.
-
-## Runtime acceptance attempt
-
-A protected Vercel preview was first built successfully, but its SSO layer prevented the available connector from reaching the proof route. No application/model call occurred.
-
-A separate transient gated acceptance project was then created to measure only the provider capability. Runtime diagnostics showed:
+Its public-CI integration contract passed, but runtime diagnostics showed both supported Gateway credential sources absent:
 
 ```text
 has_ai_gateway_api_key = false
 has_vercel_oidc_token = false
 ```
 
-The gateway proof's credential guard therefore stopped execution before constructing a Gateway/model request.
+The guard stopped execution before constructing a Gateway model request.
 
-Correct statuses:
+Historical statuses remain:
 
-- provider adapter: **PASS**;
-- provider install/contract: **PASS**;
-- actual foundation-model invocation: **UNRUN**;
-- runtime blocker: **BLOCKED_RUNTIME_GATEWAY_CREDENTIAL**;
-- request reached AI Gateway: **NO**;
-- model spend reached Gateway: **NO**.
+- provider adapter/contract: **PASS**;
+- actual Vercel AI Gateway model invocation: **UNRUN**;
+- request reached Gateway: **NO**.
 
-The transient model-call capability was immediately removed. The auxiliary project now exposes only a no-call receipt:
-
-- receipt-only deployment: `dpl_DhThxgrR4R5wf2T79Ws2Da6poMwh`;
-- model-call capability: `REMOVED`.
-
-## Why this is not a submission blocker
-
-The competition requires a Strands-based agent, not a specific external model provider. The accepted public Authority Cut path already executes the real Strands SDK Agent/tool loop and the full human-control workflow. Foundation-model execution would strengthen presentation/robustness evidence, but the current absence of a runtime Gateway credential is an optional score-upgrade boundary rather than an incomplete core implementation.
-
-## Safe upgrade path
-
-If a supported runtime credential is provisioned before submission:
-
-1. deploy the protected acceptance entrypoint only;
-2. confirm the credential exists without printing it;
-3. run one full model-backed workflow;
-4. accept PASS only if all tool-boundary and downstream-state assertions succeed;
-5. retain only hashed model-response receipts in public evidence;
-6. remove/disable the paid acceptance route again;
-7. do not attach a cost-incurring model route to the public judge URL.
+Do not rewrite this historical failure as PASS merely because the separate native Bedrock path later succeeded.
 
 ## Claim boundary
 
-Do not claim a foundation model executed Authority Cut unless an actual provider invocation and all workflow assertions are observed. Current correct classification is **UNRUN / BLOCKED_RUNTIME_GATEWAY_CREDENTIAL**.
+Safe current claim:
+
+> A real Amazon Nova Lite foundation model, invoked through native Amazon Bedrock by a Strands Agent in `eu-central-1`, executed the Authority Cut workflow while authority mutation remained external-human-only and the existing correction-propagation invariants remained enforced.
+
+Do not claim that:
+
+- the public judge URL is Bedrock-backed;
+- the historical AgentCore invocation was foundation-model-backed;
+- the historical Vercel AI Gateway attempt invoked a model;
+- Authority Cut solves general corrigibility, alignment or autonomous-agent safety.

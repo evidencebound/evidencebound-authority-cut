@@ -6,7 +6,7 @@
 
 Authority Cut is the AWS Agents for Humans / Professional Agents submission candidate.
 
-Verified submission evidence now includes:
+Verified evidence includes:
 
 - authentic Strands Agents SDK orchestration;
 - real model-callable tool execution;
@@ -17,7 +17,8 @@ Verified submission evidence now includes:
 - reversible compensation;
 - separately gated irreversible first-funds action;
 - public CI and public live judge surface;
-- **verified Amazon Bedrock AgentCore Runtime deployment and live invocation**.
+- verified Amazon Bedrock AgentCore Runtime deployment and live invocation;
+- **verified native Amazon Bedrock / Amazon Nova Lite foundation-model-backed Strands execution**.
 
 Public judge URL:
 
@@ -76,6 +77,47 @@ irreversible_transmit_after_correction = INVALIDATED
 receipt_count = 14
 ```
 
+## Native Amazon Bedrock foundation-model acceptance - VERIFIED
+
+On 2026-09-01 a separate owner-authenticated AWS CloudShell acceptance executed the exact Authority Cut source commit:
+
+`9998565c6db8083446caef7e20a6cf03601533e6`
+
+Target:
+
+- provider: native Amazon Bedrock;
+- region: `eu-central-1`;
+- inference profile: `eu.amazon.nova-lite-v1:0`;
+- profile state: `ACTIVE`, `SYSTEM_DEFINED`, 4 target models;
+- Strands version: `1.52.0`;
+- same three model-callable tools;
+- `authority_mutation_tools=[]`;
+- authority mutation remained external-human-only.
+
+Independent direct runtime probe:
+
+```text
+DIRECT_CONVERSE=PASS
+STOP_REASON=end_turn
+INPUT_TOKENS=8
+OUTPUT_TOKENS=5
+TOTAL_TOKENS=13
+```
+
+Full Strands / Authority Cut acceptance:
+
+```text
+AUTHORITY_CUT_BEDROCK=PASS
+EXECUTION=REAL_STRANDS_AGENT_LOOP_FOUNDATION_MODEL
+FOUNDATION_MODEL_INVOCATION=PASS
+```
+
+The fail-closed promotion gate requires three distinct model response SHA-256 receipts with positive token usage and all existing control/correction invariants before it can return PASS.
+
+This does **not** change the public Vercel proof into a paid-model route and does **not** retroactively make the historical AgentCore invocation foundation-model-backed.
+
+See `docs/bedrock-foundation-model-acceptance-2026-09-01.md`.
+
 ## AgentCore Runtime - VERIFIED
 
 On 2026-08-23 Authority Cut was deployed to Amazon Bedrock AgentCore Runtime and invoked through the real AgentCore data plane.
@@ -106,7 +148,7 @@ IRREVERSIBLE_TRANSMIT=INVALIDATED
 FOUNDATION_MODEL_INVOCATION=UNVERIFIED
 ```
 
-The successful AgentCore integration does not change the foundation-model truth boundary. The deployed Runtime uses the same deterministic custom Strands `Model` provider as the reproducible public proof.
+That historical AgentCore Runtime used the deterministic custom Strands provider. Its recorded foundation-model status remains historically correct. The later native Bedrock acceptance is a distinct execution path.
 
 See `docs/agentcore-acceptance-2026-08-23.md`.
 
@@ -142,7 +184,7 @@ The page runs a reset-each-call synthetic vendor-onboarding workflow and display
 - `POST /api/strands-proof`
 - `/api/strands-proof-get`
 
-The public demo intentionally creates no external vendor or payment effects.
+The public demo intentionally creates no external vendor or payment effects and intentionally remains credential-free.
 
 ## Reproduce locally
 
@@ -161,6 +203,16 @@ python scripts/run_strands_ci_probe.py
 python scripts/run_public_strands_surface_probe.py
 ```
 
+Native Bedrock acceptance, with an authenticated AWS identity:
+
+```bash
+python -m pip install -e '.[aws]'
+python scripts/run_bedrock_acceptance.py \
+  --region eu-central-1 \
+  --model-id eu.amazon.nova-lite-v1:0 \
+  --output /tmp/authority-cut-bedrock-acceptance.json
+```
+
 AgentCore source contract:
 
 ```bash
@@ -170,20 +222,22 @@ python scripts/run_agentcore_contract_probe.py
 
 ## Foundation-model boundary
 
-The optional OpenAI-compatible Strands provider contract is implemented and fail-closed without a runtime credential.
+Current truth boundary:
 
-Correct status:
+- native Amazon Bedrock / Amazon Nova Lite real model invocation: **PASS**;
+- full native Bedrock Strands Authority Cut acceptance: **PASS**;
+- historical optional Vercel AI Gateway adapter contract: **PASS**;
+- historical Vercel AI Gateway model request: **UNRUN**;
+- canonical public Vercel proof: deterministic custom Strands provider;
+- historical AgentCore invocation: deterministic custom Strands provider.
 
-- provider integration contract: **PASS**;
-- actual foundation-model invocation: **UNVERIFIED / UNRUN**.
-
-Do not infer foundation-model execution from the deterministic Strands proof or AgentCore acceptance.
+See `docs/foundation-model-boundary.md`.
 
 ## Historical AWS identity boundary
 
 An earlier non-mutating GitHub OIDC probe could not reuse a pre-existing EvidenceBound deployment role from the new competition repository identity. That specific path remains `BLOCKED_AWS_OIDC_TRUST`.
 
-The verified AgentCore deployment used an independently authenticated AWS CloudShell path and a dedicated least-privilege Runtime execution role. The successful deployment does not retroactively change the historical OIDC result.
+Verified AWS acceptances used independently authenticated AWS CloudShell paths; no need arose to weaken the historical OIDC trust boundary.
 
 ## New-project / pre-existing-work disclosure
 
@@ -213,8 +267,11 @@ Minimality is exact only over the policy-defined semantic decision bundles suppl
 
 - `docs/prior-art.md`
 - `docs/claims-ledger.md`
+- `docs/bedrock-foundation-model-acceptance-2026-09-01.md`
 - `docs/agentcore-acceptance-2026-08-23.md`
+- `docs/foundation-model-boundary.md`
 - `docs/aws-capability-boundary.md`
 - `handoff/AWS_JUDGE_PACK.md`
+- `handoff/BEDROCK_FOUNDATION_MODEL_ADDENDUM.md`
 - `handoff/DEVPOST_FINAL_CHECKLIST.md`
 - `qa/QA_RECEIPT.json`
