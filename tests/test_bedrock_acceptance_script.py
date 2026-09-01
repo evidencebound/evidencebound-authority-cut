@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import importlib.util
 import json
 from pathlib import Path
@@ -61,6 +62,37 @@ class FakeSession:
         raise AssertionError(service_name)
 
 
+def good_preflight():
+    return {
+        "aws_identity_sha256": "b" * 64,
+        "inference_profile_id": "eu.amazon.nova-lite-v1:0",
+        "inference_profile_status": "ACTIVE",
+        "inference_profile_type": "SYSTEM_DEFINED",
+        "inference_profile_model_count": 4,
+    }
+
+
+def good_workflow():
+    return {
+        "execution": "REAL_STRANDS_AGENT_LOOP_FOUNDATION_MODEL",
+        "provider": "AMAZON_BEDROCK",
+        "model_id": "eu.amazon.nova-lite-v1:0",
+        "region": "eu-central-1",
+        "foundation_model_invocation": "PASS",
+        "acceptance_mode": "REAL_NATIVE_BEDROCK",
+        "authority_mutation_tools": [],
+        "authority_boundary": "EXTERNAL_HUMAN_ONLY",
+        "safe_actions_preserved": 5,
+        "protected_reversible_effects_rolled_back": 6,
+        "irreversible_transmit_after_correction": "INVALIDATED",
+        "model_response_receipts": [
+            {"phase": "safe", "sha256": "1" * 64, "usage": {"totalTokens": 10}},
+            {"phase": "vendor-risk", "sha256": "2" * 64, "usage": {"totalTokens": 11}},
+            {"phase": "payment-release", "sha256": "3" * 64, "usage": {"totalTokens": 12}},
+        ],
+    }
+
+
 def test_cli_preflight_proves_identity_and_active_profile_without_publishing_identifiers():
     script = load_script()
     session = FakeSession()
@@ -104,30 +136,8 @@ def test_evidence_record_binds_exact_commit_time_preflight_and_workflow_result()
     record = script.build_evidence_record(
         git_commit="a" * 40,
         accepted_at_utc="2026-09-01T06:30:00Z",
-        preflight={
-            "aws_identity_sha256": "b" * 64,
-            "inference_profile_id": "eu.amazon.nova-lite-v1:0",
-            "inference_profile_status": "ACTIVE",
-            "inference_profile_type": "SYSTEM_DEFINED",
-            "inference_profile_model_count": 4,
-        },
-        workflow={
-            "execution": "REAL_STRANDS_AGENT_LOOP_FOUNDATION_MODEL",
-            "provider": "AMAZON_BEDROCK",
-            "model_id": "eu.amazon.nova-lite-v1:0",
-            "region": "eu-central-1",
-            "foundation_model_invocation": "PASS",
-            "authority_mutation_tools": [],
-            "authority_boundary": "EXTERNAL_HUMAN_ONLY",
-            "safe_actions_preserved": 5,
-            "protected_reversible_effects_rolled_back": 6,
-            "irreversible_transmit_after_correction": "INVALIDATED",
-            "model_response_receipts": [
-                {"phase": "safe", "sha256": "1" * 64, "usage": {"totalTokens": 10}},
-                {"phase": "vendor-risk", "sha256": "2" * 64, "usage": {"totalTokens": 11}},
-                {"phase": "payment-release", "sha256": "3" * 64, "usage": {"totalTokens": 12}},
-            ],
-        },
+        preflight=good_preflight(),
+        workflow=good_workflow(),
     )
 
     assert record["git_commit"] == "a" * 40
@@ -138,24 +148,92 @@ def test_evidence_record_binds_exact_commit_time_preflight_and_workflow_result()
 
 def test_evidence_record_rejects_non_pass_or_malformed_commit():
     script = load_script()
-    preflight = {
-        "aws_identity_sha256": "b" * 64,
-        "inference_profile_id": "eu.amazon.nova-lite-v1:0",
-        "inference_profile_status": "ACTIVE",
-        "inference_profile_type": "SYSTEM_DEFINED",
-        "inference_profile_model_count": 4,
-    }
     with pytest.raises(RuntimeError, match="exact 40-character Git SHA"):
         script.build_evidence_record(
             git_commit="not-a-sha",
             accepted_at_utc="2026-09-01T06:30:00Z",
-            preflight=preflight,
-            workflow={"foundation_model_invocation": "PASS"},
+            preflight=good_preflight(),
+            workflow=good_workflow(),
         )
+    workflow = good_workflow()
+    workflow["foundation_model_invocation"] = "UNVERIFIED"
     with pytest.raises(RuntimeError, match="workflow did not PASS"):
         script.build_evidence_record(
             git_commit="a" * 40,
             accepted_at_utc="2026-09-01T06:30:00Z",
-            preflight=preflight,
-            workflow={"foundation_model_invocation": "UNVERIFIED"},
+            preflight=good_preflight(),
+            workflow=workflow,
         )
+
+
+@pytest.mark.parametrize(
+    ("field", "bad_value"),
+    [
+        ("execution", "FOUNDATION_MODEL_CONTROL_CONTRACT_ONLY"),
+        ("provider", "OTHER_PROVIDER"),
+        ("model_id", "eu.amazon.nova-pro-v1:0"),
+        ("region", "eu-west-1"),
+        ("acceptance_mode", "CONTROL_CONTRACT_ONLY"),
+        ("authority_mutation_tools", ["approve"]),
+        ("authority_boundary", "MODEL_MUTABLE"),
+        ("safe_actions_preserved", 4),
+        ("protected_reversible_effects_rolled_back", 5),
+        ("irreversible_transmit_after_correction", "BLOCKED"),
+    ],
+)
+def test_evidence_record_rejects_mismatched_real_acceptance_invariants(field, bad_value):
+    script = load_script()
+    workflow = good_workflow()
+    workflow[field] = bad_value
+    with pytest.raises(RuntimeError, match="acceptance invariant"):
+        script.build_evidence_record(
+            git_commit="a" * 40,
+            accepted_at_utc="2026-09-01T06:30:00Z",
+            preflight=good_preflight(),
+            workflow=workflow,
+        )
+
+
+def test_evidence_record_rejects_profile_model_mismatch():
+    script = load_script()
+    preflight = good_preflight()
+    preflight["inference_profile_id"] = "different-profile"
+    with pytest.raises(RuntimeError, match="profile/model mismatch"):
+        script.build_evidence_record(
+            git_commit="a" * 40,
+            accepted_at_utc="2026-09-01T06:30:00Z",
+            preflight=preflight,
+            workflow=good_workflow(),
+        )
+
+
+@pytest.mark.parametrize("mutation", ["missing", "duplicate", "zero_usage"])
+def test_evidence_record_requires_three_distinct_positive_usage_receipts(mutation):
+    script = load_script()
+    workflow = good_workflow()
+    if mutation == "missing":
+        workflow["model_response_receipts"].pop()
+    elif mutation == "duplicate":
+        workflow["model_response_receipts"][2]["sha256"] = workflow["model_response_receipts"][1]["sha256"]
+    else:
+        workflow["model_response_receipts"][1]["usage"]["totalTokens"] = 0
+    with pytest.raises(RuntimeError, match="model response receipts"):
+        script.build_evidence_record(
+            git_commit="a" * 40,
+            accepted_at_utc="2026-09-01T06:30:00Z",
+            preflight=good_preflight(),
+            workflow=workflow,
+        )
+
+
+def test_evidence_record_does_not_mutate_input():
+    script = load_script()
+    workflow = good_workflow()
+    before = copy.deepcopy(workflow)
+    script.build_evidence_record(
+        git_commit="a" * 40,
+        accepted_at_utc="2026-09-01T06:30:00Z",
+        preflight=good_preflight(),
+        workflow=workflow,
+    )
+    assert workflow == before
