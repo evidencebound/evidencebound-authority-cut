@@ -48,6 +48,45 @@ jobs:
           assert p['agentcore']=='UNVERIFIED'
           print('VERCEL_ENTRYPOINT_STRANDS_PROOF=PASS')
           PY
+  bedrock-contract:
+    runs-on: ubuntu-latest
+    env:
+      AWS_EC2_METADATA_DISABLED: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e '.[aws,dev]'
+      - name: Verify native Bedrock provider construction without network invocation
+        run: |
+          python - <<'PY'
+          from authority_cut.bedrock_proof import (
+              AUTHORITY_MUTATION_TOOLS,
+              DEFAULT_BEDROCK_MODEL_ID,
+              DEFAULT_BEDROCK_REGION,
+              build_bedrock_agent,
+          )
+          from authority_cut.strands_app import STRANDS_TOOL_NAMES
+          agent = build_bedrock_agent(
+              model_id=DEFAULT_BEDROCK_MODEL_ID,
+              region=DEFAULT_BEDROCK_REGION,
+          )
+          assert tuple(STRANDS_TOOL_NAMES) == (
+              'execute_safe_vendor_work',
+              'get_authority_cut',
+              'execute_authorized_vendor_work',
+          )
+          assert AUTHORITY_MUTATION_TOOLS == ()
+          assert agent is not None
+          print('BEDROCK_PROVIDER_CONSTRUCTION=PASS')
+          print('BEDROCK_MODEL_ID=' + DEFAULT_BEDROCK_MODEL_ID)
+          print('BEDROCK_REGION=' + DEFAULT_BEDROCK_REGION)
+          print('FOUNDATION_MODEL_INVOCATION=UNRUN')
+          PY
+      - name: Verify Bedrock acceptance contracts without external traffic
+        run: python -m pytest -q tests/test_bedrock_proof.py tests/test_bedrock_acceptance_script.py
+      - run: python -m compileall -q src tests scripts
   agentcore-direct-code-contract:
     runs-on: ubuntu-latest
     steps:
