@@ -165,7 +165,7 @@ def test_control_contract_preserves_external_authority_but_cannot_claim_model_pa
         require_model_metrics=False,
     )
 
-    assert result["execution"] == "REAL_STRANDS_AGENT_LOOP_FOUNDATION_MODEL"
+    assert result["execution"] == "FOUNDATION_MODEL_CONTROL_CONTRACT_ONLY"
     assert result["authority_mutation_tools"] == []
     assert result["authority_boundary"] == "EXTERNAL_HUMAN_ONLY"
     assert result["safe_actions_preserved"] == 5
@@ -221,6 +221,7 @@ def test_bedrock_wrapper_alone_promotes_pass_after_three_usage_bearing_responses
         "region": "eu-central-1",
     }
     assert agent.calls == 3
+    assert result["execution"] == "REAL_STRANDS_AGENT_LOOP_FOUNDATION_MODEL"
     assert result["provider"] == "AMAZON_BEDROCK"
     assert result["model_id"] == "eu.amazon.nova-lite-v1:0"
     assert result["region"] == "eu-central-1"
