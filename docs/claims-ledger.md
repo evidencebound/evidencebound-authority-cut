@@ -2,16 +2,16 @@
 
 | Claim | Evidence class | Status |
 |---|---|---|
-| 5 safe vendor-onboarding actions run before human attention | deterministic controlled workflow + live public Strands path | VERIFIED |
+| 5 safe vendor-onboarding actions run before human attention | deterministic controlled workflow + live public Strands path + native Bedrock acceptance | VERIFIED |
 | 7 protected effects map to 3 policy-defined decisions | static graph + evaluation | VERIFIED |
 | 57.14% fewer prompts than per-protected-effect baseline in this fixed workflow | deterministic calculation `(7-3)/7` | VERIFIED |
-| model-callable Strands tools cannot approve/revoke authority | source + tests + public CI + live Vercel tool boundary | VERIFIED |
+| model-callable Strands tools cannot approve/revoke authority | source + tests + public CI + live Vercel tool boundary + native Bedrock acceptance | VERIFIED |
 | premature first-funds approval fails closed | unit/API tests + live authority surface | VERIFIED |
-| first-funds becomes ready only after remittance preview exists | controlled/live workflow state | VERIFIED |
-| correction rolls back 6 executed reversible protected effects in the fixed path | evaluation + public Strands loop + Vercel live proof + AgentCore invocation | VERIFIED |
-| 5 unrelated safe actions remain executed after the correction | public Strands loop + Vercel live proof + AgentCore invocation | VERIFIED |
-| pending irreversible transmit is invalidated after upstream correction | public Strands loop + Vercel live proof + AgentCore invocation | VERIFIED |
-| no irreversible transfer occurs without distinct `funds_release` authority in controlled path | tests/evaluation/live proof | VERIFIED |
+| first-funds becomes ready only after remittance preview exists | controlled/live workflow state + native Bedrock acceptance | VERIFIED |
+| correction rolls back 6 executed reversible protected effects in the fixed path | evaluation + public Strands loop + Vercel live proof + AgentCore invocation + native Bedrock acceptance | VERIFIED |
+| 5 unrelated safe actions remain executed after the correction | public Strands loop + Vercel live proof + AgentCore invocation + native Bedrock acceptance | VERIFIED |
+| pending irreversible transmit is invalidated after upstream correction | public Strands loop + Vercel live proof + AgentCore invocation + native Bedrock acceptance | VERIFIED |
+| no irreversible transfer occurs without distinct `funds_release` authority in controlled path | tests/evaluation/live proof + native Bedrock acceptance | VERIFIED |
 | dedicated public competition repository exists within submission period | repository provenance | VERIFIED |
 | public GitHub Actions baseline test matrix passes | GitHub Actions | VERIFIED |
 | `strands-agents==1.52.0` installs and `build_agent()` constructs the published Agent | public GitHub Actions Strands lane | VERIFIED |
@@ -24,11 +24,14 @@
 | real Strands SDK loop executed inside AgentCore Runtime | AgentCore response + assertions | VERIFIED |
 | AgentCore invocation preserved `authority_mutation_tools=[]` and `EXTERNAL_HUMAN_ONLY` | AgentCore response + assertions | VERIFIED |
 | AgentCore invocation preserved 5 safe actions, rolled back 6 reversible effects, and invalidated transmit | AgentCore response + assertions | VERIFIED |
+| native Amazon Bedrock inference profile `eu.amazon.nova-lite-v1:0` was ACTIVE in `eu-central-1` | owner-authenticated AWS CloudShell control-plane readback | VERIFIED |
+| direct Amazon Bedrock Runtime `Converse` invocation against Nova Lite succeeded | owner-authenticated AWS CloudShell runtime probe; token usage observed | VERIFIED |
+| a real Amazon Nova Lite foundation-model-backed Strands agent executed the Authority Cut workflow | native Bedrock acceptance at exact source SHA; fail-closed response-receipt and workflow assertions | VERIFIED |
+| native Bedrock foundation-model run preserved the external-human-only authority boundary | exact three-tool source + live model sequence + fail-closed promotion gate | VERIFIED |
 | optional OpenAI-compatible foundation-model adapter installs and fails closed without runtime credential | public GitHub Actions gateway-contract lane | VERIFIED |
-| a foundation-model-backed Strands agent executed the full workflow | external model invocation / trace | UNRUN / BLOCKED_RUNTIME_GATEWAY_CREDENTIAL |
+| historical Vercel AI Gateway foundation-model invocation occurred | fail-closed runtime diagnostic | NO / UNRUN |
 | direct Vercel acceptance runtime had `AI_GATEWAY_API_KEY` | runtime boolean diagnostic | FALSE |
 | direct Vercel acceptance runtime had `VERCEL_OIDC_TOKEN` | runtime boolean diagnostic | FALSE |
-| model request reached Vercel AI Gateway during the acceptance attempt | fail-closed runtime diagnostic | NO |
 | existing EvidenceBound AWS OIDC role can be assumed by this new repository identity | non-mutating GitHub OIDC probe | FALSE / BLOCKED_AWS_OIDC_TRUST |
 | mechanism improves real-world safety/productivity | field study | UNVERIFIED |
 
@@ -40,7 +43,7 @@
 - `/api/strands-proof-get`: HTTP 200
 - runtime log observed the real Strands tool sequence.
 
-Canonical live proof returned:
+Canonical public live proof remains intentionally deterministic and credential-free:
 
 - `execution=REAL_STRANDS_AGENT_LOOP_DETERMINISTIC_MODEL`
 - `authority_mutation_tools=[]`
@@ -49,6 +52,43 @@ Canonical live proof returned:
 - `protected_reversible_effects_rolled_back=6`
 - `irreversible_transmit_after_correction=INVALIDATED`
 - `receipt_count=14`
+
+## Native Amazon Bedrock foundation-model acceptance
+
+Accepted 2026-09-01 from owner-authenticated AWS CloudShell at exact Authority Cut source SHA:
+
+`9998565c6db8083446caef7e20a6cf03601533e6`
+
+AWS preflight:
+
+- identity: PASS;
+- region: `eu-central-1`;
+- inference profile: `eu.amazon.nova-lite-v1:0`;
+- profile status: `ACTIVE`;
+- profile type: `SYSTEM_DEFINED`;
+- profile target-model count: `4`.
+
+Independent direct runtime probe:
+
+```text
+DIRECT_CONVERSE=PASS
+STOP_REASON=end_turn
+INPUT_TOKENS=8
+OUTPUT_TOKENS=5
+TOTAL_TOKENS=13
+```
+
+Full Strands / Authority Cut run:
+
+```text
+AUTHORITY_CUT_BEDROCK=PASS
+EXECUTION=REAL_STRANDS_AGENT_LOOP_FOUNDATION_MODEL
+FOUNDATION_MODEL_INVOCATION=PASS
+```
+
+The accepted code can promote this status only after three distinct model-response SHA-256 receipts with positive token usage and all Authority Cut control/correction invariants pass. Approve/revoke remains outside the model-callable tool set.
+
+See `docs/bedrock-foundation-model-acceptance-2026-09-01.md`.
 
 ## AgentCore acceptance evidence
 
@@ -68,16 +108,21 @@ Accepted 2026-08-23:
 
 AWS account, role and bucket identifiers are intentionally omitted from the public ledger.
 
+The historical AgentCore deployment used the deterministic custom Strands provider. The separate 2026-09-01 native Bedrock acceptance does not retroactively change that historical fact.
+
 See `docs/agentcore-acceptance-2026-08-23.md`.
 
 ## Foundation-model acceptance boundary
 
-The optional adapter was not promoted to a public route. Its public-CI contract passed, but direct Vercel runtime diagnostics showed both supported Gateway credential sources absent. The acceptance function therefore failed before constructing a Gateway request.
+Two provider paths must remain distinguished:
 
-Correct claim: **provider path prepared and fail-closed; actual foundation-model invocation UNRUN**.
+1. **Native Amazon Bedrock / Nova Lite:** real runtime invocation and full Strands Authority Cut acceptance **VERIFIED / PASS** on 2026-09-01.
+2. **Historical optional Vercel AI Gateway adapter:** provider contract **PASS**, actual Gateway model request **UNRUN** because the runtime credential was absent.
+
+The canonical public Vercel judge surface remains the deterministic custom Strands provider. A paid model endpoint was not added to that public route.
 
 ## AWS identity boundary
 
 Non-mutating GitHub Actions run `32219855151` attempted to reuse a pre-existing EvidenceBound deployment role from the new Authority Cut repository and received `Not authorized to perform sts:AssumeRoleWithWebIdentity`. That historical path remains blocked.
 
-AgentCore was subsequently verified through an independently authenticated AWS CloudShell deployment path with a dedicated least-privilege Runtime execution role. The successful AgentCore acceptance does not retroactively convert the old GitHub OIDC probe into PASS.
+AgentCore was subsequently verified through an independently authenticated AWS CloudShell deployment path with a dedicated least-privilege Runtime execution role. The native Bedrock foundation-model acceptance was also executed through owner-authenticated AWS CloudShell. Neither result retroactively converts the old GitHub OIDC probe into PASS.
