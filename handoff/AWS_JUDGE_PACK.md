@@ -4,11 +4,9 @@ Snapshot updated: 2026-09-01
 
 ## Decision
 
-**READY engineering.**
+**READY / SUBMITTED / LIVE READBACK PASS.**
 
-Authority Cut is the Professional Agents submission candidate. The public deterministic Strands judge path is independently verifiable, Amazon Bedrock AgentCore Runtime deployment/invocation is verified, and a separate native Amazon Bedrock / Amazon Nova Lite foundation-model-backed Strands acceptance is now also verified.
-
-This evidence pass does not independently read back or modify the Devpost submission state.
+Authority Cut is the Professional Agents submission candidate. The public deterministic Strands judge path is independently verifiable, Amazon Bedrock AgentCore Runtime deployment/invocation is verified, a separate native Amazon Bedrock / Amazon Nova Lite foundation-model-backed Strands acceptance is verified, and the authenticated Devpost project was read back after the evidence update with its submitted relationship intact.
 
 ## Identity
 
@@ -27,6 +25,10 @@ Public repository:
 Public judge URL:
 
 `https://evidencebound-authority-cut.vercel.app`
+
+Devpost:
+
+`https://devpost.com/software/authority-cut`
 
 Video:
 
@@ -184,6 +186,22 @@ Real `InvokeAgentRuntime` returned HTTP 200 and passed the Strands loop and auth
 
 Important historical boundary: that AgentCore Runtime used the deterministic custom Strands provider. Its recorded `FOUNDATION_MODEL_INVOCATION=UNVERIFIED` remains correct for that historical invocation. The 2026-09-01 native Bedrock acceptance is a distinct execution path.
 
+## Devpost live readback - PASS
+
+Authenticated Devpost readback after the Bedrock description update verified:
+
+- project id: `1394239`;
+- slug: `authority-cut`;
+- project state: `published`;
+- project URL: `https://devpost.com/software/authority-cut`;
+- video still `https://youtu.be/dY8W-AP4mms`;
+- hackathon: `Agents for Humans Hackathon` / `agentsforhumans`;
+- submission timestamp remains `2026-08-23T05:14:52.895-04:00`;
+- authenticated hackathon relationships remain `registered`, `submitted`;
+- live description contains the verified native Bedrock / Nova Lite acceptance and preserves the deterministic-public-proof and historical-AgentCore truth boundaries.
+
+No re-submission, video replacement or public judge URL change was required.
+
 ## Current judging-criterion mapping
 
 ### Technical Implementation
@@ -244,21 +262,12 @@ This AWS competition repository was created during the submission period. Its ve
 
 Do not rewrite historical failed/unrun paths as PASS.
 
-## Submission-safe technical patch
-
-If written Devpost fields can still be edited without jeopardizing submission state, a concise verified addition is:
-
-> Additional production-depth acceptance: the same three-tool Strands Authority Cut workflow was executed with Amazon Nova Lite through native Amazon Bedrock in eu-central-1. Direct Bedrock Runtime Converse passed, and the full Strands workflow returned `REAL_STRANDS_AGENT_LOOP_FOUNDATION_MODEL` with `FOUNDATION_MODEL_INVOCATION=PASS` while approve/revoke remained outside the model tool surface. The public judge URL intentionally remains deterministic and credential-free.
-
-Do not replace the existing video and do not claim the video demonstrates this later acceptance.
-
 ## Final classification
 
-**READY engineering.**
+**READY / SUBMITTED / LIVE READBACK PASS.**
 
 Verified limitations:
 
 - real customer productivity/adoption: **UNVERIFIED**;
 - arbitrary external-system compensation safety: **UNVERIFIED**;
-- general corrigibility/alignment claim: **NOT CLAIMED**;
-- independent Devpost live readback in this evidence pass: **UNRUN**.
+- general corrigibility/alignment claim: **NOT CLAIMED**.
