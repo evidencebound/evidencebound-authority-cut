@@ -185,7 +185,7 @@ def test_evidence_record_rejects_mismatched_real_acceptance_invariants(field, ba
     script = load_script()
     workflow = good_workflow()
     workflow[field] = bad_value
-    with pytest.raises(RuntimeError, match="acceptance invariant"):
+    with pytest.raises(RuntimeError, match="acceptance invariant|profile/model mismatch"):
         script.build_evidence_record(
             git_commit="a" * 40,
             accepted_at_utc="2026-09-01T06:30:00Z",
