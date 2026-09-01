@@ -1,12 +1,11 @@
 # Authority Cut - Devpost Final Checklist
 
-Snapshot updated: 2026-08-23
+Snapshot updated: 2026-09-01
 
 ## Competition
 
 **AWS Agents for Humans**
 
-- submission deadline: **2026-09-14 17:00 PT / 2026-09-15 00:00 UTC**;
 - target prize track: **Professional Agents**;
 - public video: YouTube or Vimeo, maximum **5 minutes**;
 - AWS Builder ID required;
@@ -19,11 +18,17 @@ Snapshot updated: 2026-08-23
 
 Repository:
 
-`https://github.com/moneyparking/evidencebound-authority-cut`
+`https://github.com/evidencebound/evidencebound-authority-cut`
 
 Public functional judge URL:
 
 `https://evidencebound-authority-cut.vercel.app`
+
+Video:
+
+`https://youtu.be/dY8W-AP4mms`
+
+Do not replace the existing video solely because the later Bedrock foundation-model acceptance passed.
 
 ## Engineering readiness
 
@@ -44,30 +49,64 @@ Public functional judge URL:
 - Amazon Bedrock AgentCore Runtime deployment: **PASS**
 - AgentCore live invocation: **PASS**
 - real Strands loop inside AgentCore: **PASS**
-- foundation-model execution: **UNVERIFIED / optional**
+- native Amazon Bedrock / Nova Lite direct runtime invocation: **PASS**
+- native Amazon Bedrock / Nova Lite full Strands Authority Cut execution: **PASS**
 
-## AgentCore acceptance
+## Native Bedrock foundation-model acceptance
+
+Verified 2026-09-01 at exact source SHA:
+
+`9998565c6db8083446caef7e20a6cf03601533e6`
+
+AWS target/readback:
+
+- region: `eu-central-1`;
+- inference profile: `eu.amazon.nova-lite-v1:0`;
+- status: `ACTIVE`;
+- type: `SYSTEM_DEFINED`;
+- model count: 4.
+
+Independent runtime probe:
+
+```text
+DIRECT_CONVERSE=PASS
+STOP_REASON=end_turn
+INPUT_TOKENS=8
+OUTPUT_TOKENS=5
+TOTAL_TOKENS=13
+```
+
+Full Strands result:
+
+```text
+AUTHORITY_CUT_BEDROCK=PASS
+EXECUTION=REAL_STRANDS_AGENT_LOOP_FOUNDATION_MODEL
+FOUNDATION_MODEL_INVOCATION=PASS
+```
+
+See `docs/bedrock-foundation-model-acceptance-2026-09-01.md`.
+
+## Historical AgentCore acceptance
 
 Verified 2026-08-23:
 
-- region: `eu-central-1`
-- Runtime: `AuthorityCutRuntime`, version `1`
-- status: `READY`
-- direct-code / S3 CodeZip
-- Python: `PYTHON_3_13`
-- entry point: `agentcore_main.py`
-- packaged source HEAD: `200d71f963bb4496a6f01a6cf1788695b3164739`
-- CodeZip SHA-256: `67c9ce7de97f48970d3c595e6914fef314011fa5cebccf4f01cd4b6bea32690e`
-- `InvokeAgentRuntime`: HTTP 200
-- Strands loop inside AgentCore: PASS
-- `authority_mutation_tools=[]`: PASS
-- `authority_boundary=EXTERNAL_HUMAN_ONLY`: PASS
-- safe actions preserved: 5
-- reversible protected effects rolled back: 6
-- irreversible transmit: `INVALIDATED`
-- foundation-model invocation: `UNVERIFIED`
+- region: `eu-central-1`;
+- Runtime: `AuthorityCutRuntime`, version `1`;
+- status: `READY`;
+- direct-code / S3 CodeZip;
+- Python: `PYTHON_3_13`;
+- entry point: `agentcore_main.py`;
+- packaged source HEAD: `200d71f963bb4496a6f01a6cf1788695b3164739`;
+- CodeZip SHA-256: `67c9ce7de97f48970d3c595e6914fef314011fa5cebccf4f01cd4b6bea32690e`;
+- `InvokeAgentRuntime`: HTTP 200;
+- Strands loop inside AgentCore: PASS;
+- `authority_mutation_tools=[]`: PASS;
+- `authority_boundary=EXTERNAL_HUMAN_ONLY`: PASS;
+- safe actions preserved: 5;
+- reversible protected effects rolled back: 6;
+- irreversible transmit: `INVALIDATED`.
 
-See `docs/agentcore-acceptance-2026-08-23.md`.
+Historical boundary: this AgentCore invocation used the deterministic custom Strands provider. Its old `FOUNDATION_MODEL_INVOCATION=UNVERIFIED` record remains correct for that invocation; the later native Bedrock acceptance is separate.
 
 ## Judge test path
 
@@ -81,7 +120,8 @@ See `docs/agentcore-acceptance-2026-08-23.md`.
 8. Confirm `first-funds` becomes ready only after remittance preview while transmit remains blocked.
 9. Inspect human correction: six protected reversible effects `ROLLED_BACK`, transmit `INVALIDATED`, five safe actions preserved.
 10. Cross-check `/api/tool-boundary` and `/api/evaluation` if desired.
-11. For AWS deployment evidence, inspect `docs/agentcore-acceptance-2026-08-23.md`.
+11. For AWS foundation-model proof, inspect `docs/bedrock-foundation-model-acceptance-2026-09-01.md`.
+12. For AgentCore deployment evidence, inspect `docs/agentcore-acceptance-2026-08-23.md`.
 
 ## Stage Two judging mapping
 
@@ -92,10 +132,9 @@ Lead with:
 - authentic Strands execution;
 - explicit external-human authority boundary;
 - correction propagation;
+- verified native Bedrock / Nova Lite foundation-model execution;
 - verified AgentCore Runtime deployment/invocation;
 - public CI and public judge path.
-
-Do not imply that AgentCore acceptance proves foundation-model execution.
 
 ### Design
 
@@ -109,68 +148,38 @@ Describe professional operations use cases. Keep the 57.14% reduction explicitly
 
 Use the invention thesis **Authority Cut Sets + Reversible Correction Propagation**. Explicitly disclose overlap with existing HITL, interrupt/resume, delegated authorization, dependency invalidation and compensation patterns.
 
-### Presentation
-
-Show real working execution. The final video should include the recorded click on **Run live Strands judge path** and the returned live states. Include AgentCore verification briefly as production-depth evidence, not as the main story.
-
-## Video checklist
-
-- [x] Problem statement: too many interruptions vs silent authority accumulation.
-- [x] Who it is for: procurement / finance / compliance / operations.
-- [x] Strands tool boundary explained.
-- [x] Fixed-workflow evaluation explained.
-- [x] Matthew narration produced.
-- [x] Real public live Strands capture recorded.
-- [x] Verified AgentCore Runtime acceptance obtained.
-- [ ] Final edit embeds the real live Strands capture.
-- [ ] Final edit includes a concise verified AgentCore proof segment.
-- [ ] Final edit states `FOUNDATION_MODEL_INVOCATION=UNVERIFIED`.
-- [ ] Final published video <=5 minutes.
-- [ ] Video published **Public** on YouTube/Vimeo.
-
-## Form / identity actions
-
-- [x] Hackathon registration completed.
-- [x] AWS Builder ID available.
-- [x] Devpost project shell `Authority Cut` exists.
-- [x] Project description / built-with / repo / live judge link prepared.
-- [ ] Upload final architecture diagram in the required Devpost field.
-- [ ] Add final public video URL.
-- [ ] Ensure Professional Agents is selected.
-- [ ] Include pre-existing-work disclosure.
-- [ ] Read back all written claims against `docs/claims-ledger.md` and `AWS_JUDGE_PACK.md`.
-- [ ] Submit.
-- [ ] Live submitted readback.
-
-## Foundation-model boundary
+## Foundation-model truth boundary
 
 Current status:
 
-- provider adapter/contract: **PASS**;
-- actual foundation-model invocation: **UNVERIFIED / UNRUN**.
+- native Amazon Bedrock / Nova Lite foundation-model invocation: **PASS**;
+- full native Bedrock Strands Authority Cut workflow: **PASS**;
+- historical optional Vercel AI Gateway provider contract: **PASS**;
+- historical Vercel AI Gateway actual model request: **UNRUN**;
+- public Vercel judge path: deterministic custom Strands provider;
+- historical AgentCore run: deterministic custom Strands provider.
 
-The accepted AgentCore deployment uses the deterministic custom Strands `Model` provider. Do not add a foundation-model claim merely because AgentCore is now verified.
+Do not infer that every deployment path is foundation-model-backed merely because the separate native Bedrock acceptance passed.
+
+## Submission-safe update
+
+If Devpost written fields remain editable without jeopardizing the submission state, add only the concise verified technical note from `handoff/BEDROCK_FOUNDATION_MODEL_ADDENDUM.md`.
+
+Do not:
+
+- replace the existing demo video;
+- imply the existing video demonstrates the 2026-09-01 Bedrock acceptance;
+- alter the public judge URL to require AWS credentials;
+- weaken the external-human authority boundary.
 
 ## Historical AWS identity boundary
 
 The pre-existing EvidenceBound GitHub OIDC role still does not trust this competition repository identity. That earlier probe remains `BLOCKED_AWS_OIDC_TRUST`.
 
-The verified AgentCore Runtime was deployed through an independently authenticated owner CloudShell path with a dedicated least-privilege Runtime role.
-
-## builder.aws bonus
-
-Three technically substantive draft posts already exist in `handoff/BUILDER_AWS_BONUS_POSTS.md`.
-
-If the current bonus remains available under the final rules readback, publish up to three qualifying posts only after the main submission package is stable. Do not delay required submission work for bonus content.
+Verified AWS acceptances used independently authenticated owner CloudShell paths rather than weakening that trust boundary.
 
 ## Final status
 
-**READY engineering / NOT YET SUBMITTED.**
+**READY engineering.**
 
-Remaining critical path:
-
-1. final video edit with live Strands + concise AgentCore evidence;
-2. publish video Public;
-3. upload architecture file;
-4. final Devpost write/readback;
-5. submit and verify `submitted` state.
+Independent Devpost live submitted-state readback in this evidence pass: **UNRUN**.
