@@ -3,7 +3,6 @@ from __future__ import annotations
 import importlib
 import importlib.util
 import json
-from types import SimpleNamespace
 
 import pytest
 
@@ -27,44 +26,33 @@ def bedrock_proof():
     return importlib.import_module("authority_cut.bedrock_proof")
 
 
-class ScriptedFoundationAgent:
-    """Model stand-in only; all control semantics execute through real Authority Cut tools."""
+class UsageResponse:
+    def __init__(self, text: str, total_tokens: int) -> None:
+        self._text = text
+        self.stop_reason = "end_turn"
+        self.metrics = type(
+            "Metrics",
+            (),
+            {
+                "accumulated_usage": {
+                    "inputTokens": total_tokens - 5,
+                    "outputTokens": 5,
+                    "totalTokens": total_tokens,
+                }
+            },
+        )()
 
-    def __init__(self) -> None:
-        self.calls = 0
-
-    def __call__(self, prompt: str):
-        self.calls += 1
-        if self.calls == 1:
-            execute_safe_vendor_work()
-            get_authority_cut()
-            text = "safe phase complete; external vendor-risk authority required"
-        elif self.calls == 2:
-            execute_authorized_vendor_work()
-            get_authority_cut()
-            text = "vendor-risk phase complete; external payment-release authority required"
-        elif self.calls == 3:
-            execute_authorized_vendor_work()
-            get_authority_cut()
-            text = "payment-release phase complete; external first-funds authority required"
-        else:
-            raise AssertionError(f"unexpected model call {self.calls}: {prompt}")
-        return SimpleNamespace(
-            stop_reason="end_turn",
-            metrics=SimpleNamespace(
-                accumulated_usage={"inputTokens": 10 + self.calls, "outputTokens": 5, "totalTokens": 15 + self.calls}
-            ),
-            __str__=lambda self: text,
-            text=text,
-        )
+    def __str__(self) -> str:
+        return self._text
 
 
 class ScriptedStringAgent:
+    """Model stand-in only; control semantics run through the real published tools."""
+
     def __init__(self) -> None:
         self.calls = 0
 
-    def __call__(self, prompt: str):
-        self.calls += 1
+    def _execute_phase(self) -> None:
         if self.calls == 1:
             execute_safe_vendor_work()
             get_authority_cut()
@@ -76,7 +64,18 @@ class ScriptedStringAgent:
             get_authority_cut()
         else:
             raise AssertionError("unexpected extra invocation")
+
+    def __call__(self, prompt: str):
+        self.calls += 1
+        self._execute_phase()
         return f"phase-{self.calls}-foundation-response"
+
+
+class ScriptedMetricsAgent(ScriptedStringAgent):
+    def __call__(self, prompt: str):
+        self.calls += 1
+        self._execute_phase()
+        return UsageResponse(f"phase-{self.calls}-bedrock-response", 20 + self.calls)
 
 
 def test_bedrock_contract_uses_verified_eu_nova_lite_profile_and_existing_tool_surface():
@@ -128,6 +127,15 @@ def test_missing_model_or_region_configuration_fails_closed(model_id, region):
         bp.build_bedrock_agent(model_id=model_id, region=region)
 
 
+def test_non_frankfurt_region_fails_closed():
+    bp = bedrock_proof()
+    with pytest.raises(RuntimeError, match="region must be eu-central-1.*fail closed"):
+        bp.build_bedrock_agent(
+            model_id="eu.amazon.nova-lite-v1:0",
+            region="eu-west-1",
+        )
+
+
 def test_missing_aws_credentials_fails_closed_before_model_invocation(monkeypatch):
     bp = bedrock_proof()
     monkeypatch.setattr(bp, "_aws_credentials_available", lambda: False)
@@ -173,15 +181,41 @@ def test_real_pass_requires_nonzero_model_usage_receipts():
     with pytest.raises(AssertionError, match="model usage metadata"):
         bp._model_response_receipt("safe", "plain string response", require_metrics=True)
 
-    response = SimpleNamespace(
-        stop_reason="end_turn",
-        metrics=SimpleNamespace(accumulated_usage={"inputTokens": 12, "outputTokens": 4, "totalTokens": 16}),
-    )
-    response.__class__.__str__ = lambda self: "bedrock response"
+    response = UsageResponse("bedrock response", 16)
     receipt = bp._model_response_receipt("safe", response, require_metrics=True)
     assert receipt["sha256"]
     assert receipt["usage"]["totalTokens"] == 16
     assert receipt["stop_reason"] == "end_turn"
+
+
+def test_bedrock_wrapper_marks_pass_only_after_three_usage_bearing_model_responses(monkeypatch):
+    bp = bedrock_proof()
+    captured = {}
+    agent = ScriptedMetricsAgent()
+
+    monkeypatch.setattr(bp, "_aws_credentials_available", lambda: True)
+
+    def fake_builder(*, model_id, region):
+        captured["model_id"] = model_id
+        captured["region"] = region
+        return agent
+
+    monkeypatch.setattr(bp, "build_bedrock_agent", fake_builder)
+    result = bp.run_bedrock_strands_proof(
+        model_id="eu.amazon.nova-lite-v1:0",
+        region="eu-central-1",
+    )
+
+    assert captured == {
+        "model_id": "eu.amazon.nova-lite-v1:0",
+        "region": "eu-central-1",
+    }
+    assert agent.calls == 3
+    assert result["provider"] == "AMAZON_BEDROCK"
+    assert result["model_id"] == "eu.amazon.nova-lite-v1:0"
+    assert result["region"] == "eu-central-1"
+    assert result["foundation_model_invocation"] == "PASS"
+    assert all(r["usage"]["totalTokens"] > 0 for r in result["model_response_receipts"])
 
 
 def test_acceptance_records_three_separate_response_hashes_without_raw_model_content():
