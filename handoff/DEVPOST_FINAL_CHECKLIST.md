@@ -28,6 +28,10 @@ Video:
 
 `https://youtu.be/dY8W-AP4mms`
 
+Devpost project:
+
+`https://devpost.com/software/authority-cut`
+
 Do not replace the existing video solely because the later Bedrock foundation-model acceptance passed.
 
 ## Engineering readiness
@@ -51,6 +55,8 @@ Do not replace the existing video solely because the later Bedrock foundation-mo
 - real Strands loop inside AgentCore: **PASS**
 - native Amazon Bedrock / Nova Lite direct runtime invocation: **PASS**
 - native Amazon Bedrock / Nova Lite full Strands Authority Cut execution: **PASS**
+- Devpost project update/readback: **PASS**
+- Devpost Agents for Humans relationship: **submitted**
 
 ## Native Bedrock foundation-model acceptance
 
@@ -123,6 +129,24 @@ Historical boundary: this AgentCore invocation used the deterministic custom Str
 11. For AWS foundation-model proof, inspect `docs/bedrock-foundation-model-acceptance-2026-09-01.md`.
 12. For AgentCore deployment evidence, inspect `docs/agentcore-acceptance-2026-08-23.md`.
 
+## Devpost live readback - PASS
+
+On 2026-09-01 the authenticated Devpost project was read directly after the Bedrock evidence update.
+
+Verified:
+
+- project id: `1394239`;
+- slug: `authority-cut`;
+- project state: `published`;
+- project URL: `https://devpost.com/software/authority-cut`;
+- video remains `https://youtu.be/dY8W-AP4mms`;
+- hackathon: `Agents for Humans Hackathon` / `agentsforhumans`;
+- `submitted_at`: `2026-08-23T05:14:52.895-04:00`;
+- authenticated hackathon relationship after the update: `registered`, `submitted`;
+- live Devpost description now includes the verified native Bedrock / Nova Lite foundation-model acceptance and preserves the deterministic-public-proof / historical-AgentCore truth boundaries.
+
+The description update propagated through the existing project; the video and judge URL were not changed.
+
 ## Stage Two judging mapping
 
 ### Technical Implementation
@@ -161,17 +185,6 @@ Current status:
 
 Do not infer that every deployment path is foundation-model-backed merely because the separate native Bedrock acceptance passed.
 
-## Submission-safe update
-
-If Devpost written fields remain editable without jeopardizing the submission state, add only the concise verified technical note from `handoff/BEDROCK_FOUNDATION_MODEL_ADDENDUM.md`.
-
-Do not:
-
-- replace the existing demo video;
-- imply the existing video demonstrates the 2026-09-01 Bedrock acceptance;
-- alter the public judge URL to require AWS credentials;
-- weaken the external-human authority boundary.
-
 ## Historical AWS identity boundary
 
 The pre-existing EvidenceBound GitHub OIDC role still does not trust this competition repository identity. That earlier probe remains `BLOCKED_AWS_OIDC_TRUST`.
@@ -180,6 +193,4 @@ Verified AWS acceptances used independently authenticated owner CloudShell paths
 
 ## Final status
 
-**READY engineering.**
-
-Independent Devpost live submitted-state readback in this evidence pass: **UNRUN**.
+**READY / SUBMITTED / LIVE READBACK PASS.**

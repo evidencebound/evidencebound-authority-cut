@@ -33,6 +33,9 @@
 | direct Vercel acceptance runtime had `AI_GATEWAY_API_KEY` | runtime boolean diagnostic | FALSE |
 | direct Vercel acceptance runtime had `VERCEL_OIDC_TOKEN` | runtime boolean diagnostic | FALSE |
 | existing EvidenceBound AWS OIDC role can be assumed by this new repository identity | non-mutating GitHub OIDC probe | FALSE / BLOCKED_AWS_OIDC_TRUST |
+| Devpost Authority Cut project remains published after Bedrock evidence update | authenticated Devpost project readback | VERIFIED |
+| Agents for Humans submission remains submitted after project description update | authenticated Devpost project + hackathon relationship readback | VERIFIED |
+| existing demo video remains `https://youtu.be/dY8W-AP4mms` after Devpost update | authenticated Devpost project readback | VERIFIED |
 | mechanism improves real-world safety/productivity | field study | UNVERIFIED |
 
 ## Canonical public production evidence
@@ -120,6 +123,22 @@ Two provider paths must remain distinguished:
 2. **Historical optional Vercel AI Gateway adapter:** provider contract **PASS**, actual Gateway model request **UNRUN** because the runtime credential was absent.
 
 The canonical public Vercel judge surface remains the deterministic custom Strands provider. A paid model endpoint was not added to that public route.
+
+## Devpost submission readback
+
+Authenticated 2026-09-01 readback after the Bedrock evidence update verified:
+
+- project id: `1394239`;
+- slug: `authority-cut`;
+- state: `published`;
+- URL: `https://devpost.com/software/authority-cut`;
+- video unchanged: `https://youtu.be/dY8W-AP4mms`;
+- hackathon: `Agents for Humans Hackathon` / `agentsforhumans`;
+- `submitted_at`: `2026-08-23T05:14:52.895-04:00`;
+- authenticated hackathon relationships: `registered`, `submitted`;
+- live description contains the native Bedrock PASS evidence while preserving the deterministic-public-proof, historical AgentCore, historical Gateway and OIDC truth boundaries.
+
+No re-submission, video replacement or judge-URL change was required.
 
 ## AWS identity boundary
 
