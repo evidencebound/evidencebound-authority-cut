@@ -136,6 +136,15 @@ def test_non_frankfurt_region_fails_closed():
         )
 
 
+def test_unapproved_model_substitution_fails_closed():
+    bp = bedrock_proof()
+    with pytest.raises(RuntimeError, match="model must be eu.amazon.nova-lite-v1:0.*fail closed"):
+        bp.build_bedrock_agent(
+            model_id="eu.amazon.nova-pro-v1:0",
+            region="eu-central-1",
+        )
+
+
 def test_missing_aws_credentials_fails_closed_before_model_invocation(monkeypatch):
     bp = bedrock_proof()
     monkeypatch.setattr(bp, "_aws_credentials_available", lambda: False)
@@ -146,7 +155,7 @@ def test_missing_aws_credentials_fails_closed_before_model_invocation(monkeypatc
         )
 
 
-def test_foundation_acceptance_preserves_external_authority_and_correction_semantics():
+def test_control_contract_preserves_external_authority_but_cannot_claim_model_pass():
     bp = bedrock_proof()
     result = bp.run_foundation_model_acceptance(
         ScriptedStringAgent(),
@@ -162,7 +171,8 @@ def test_foundation_acceptance_preserves_external_authority_and_correction_seman
     assert result["safe_actions_preserved"] == 5
     assert result["protected_reversible_effects_rolled_back"] == 6
     assert result["irreversible_transmit_after_correction"] == "INVALIDATED"
-    assert result["foundation_model_invocation"] == "PASS"
+    assert result["foundation_model_invocation"] == "UNVERIFIED"
+    assert result["acceptance_mode"] == "CONTROL_CONTRACT_ONLY"
     assert result["phases"][0]["status"]["activate"] == "BLOCKED"
     assert result["phases"][1]["status"]["activate"] == "EXECUTED"
     assert result["phases"][1]["status"]["payments"] == "BLOCKED"
@@ -188,7 +198,7 @@ def test_real_pass_requires_nonzero_model_usage_receipts():
     assert receipt["stop_reason"] == "end_turn"
 
 
-def test_bedrock_wrapper_marks_pass_only_after_three_usage_bearing_model_responses(monkeypatch):
+def test_bedrock_wrapper_alone_promotes_pass_after_three_usage_bearing_responses(monkeypatch):
     bp = bedrock_proof()
     captured = {}
     agent = ScriptedMetricsAgent()
@@ -215,6 +225,7 @@ def test_bedrock_wrapper_marks_pass_only_after_three_usage_bearing_model_respons
     assert result["model_id"] == "eu.amazon.nova-lite-v1:0"
     assert result["region"] == "eu-central-1"
     assert result["foundation_model_invocation"] == "PASS"
+    assert result["acceptance_mode"] == "REAL_NATIVE_BEDROCK"
     assert all(r["usage"]["totalTokens"] > 0 for r in result["model_response_receipts"])
 
 
