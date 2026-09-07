@@ -13,14 +13,27 @@ except ImportError:  # deterministic kernel remains locally testable without SDK
     Agent = None
     def tool(fn): return fn
 
+from .bank_ecp_bridge import evaluate_bank_ecp_bridge
 from .runtime import get_plane
 
 
 @tool
 def execute_safe_vendor_work()->dict[str,Any]:
-    """Execute currently eligible safe vendor-onboarding work."""
+    """Execute routine vendor work and its deterministic BANK-ECP evidence check."""
     p=get_plane(); p.execute_autonomous()
-    return {'status':{k:v.value for k,v in p.state.status.items()},'receipts':p.state.receipts}
+    if 'vendor-risk' not in p.state.evidence:
+        p.apply_evidence(
+            'vendor-risk',
+            evaluate_bank_ecp_bridge('DORA_VENDOR_RESPONSIBILITY_SUPPORTED'),
+        )
+    return {
+        'status':{k:v.value for k,v in p.state.status.items()},
+        'evidence':{
+            k:{'case_id':v.case_id,'verdict':v.verdict.value,'reasons':list(v.reasons),'source_locator':v.source_locator,'evidence_class':v.evidence_class}
+            for k,v in p.state.evidence.items()
+        },
+        'receipts':p.state.receipts,
+    }
 
 
 @tool
@@ -40,11 +53,12 @@ STRANDS_TOOLS=[execute_safe_vendor_work,get_authority_cut,execute_authorized_ven
 STRANDS_TOOL_NAMES=('execute_safe_vendor_work','get_authority_cut','execute_authorized_vendor_work')
 
 SYSTEM_PROMPT=(
-    "You are a vendor-onboarding operations agent. Execute routine work through "
-    "execute_safe_vendor_work, inspect get_authority_cut, and surface its ready human "
-    "decisions without changing them. Human approvals/revocations arrive outside your "
-    "tool set. After the external principal acts, call execute_authorized_vendor_work. "
-    "Never claim that you approved, revoked, or bypassed an authority decision."
+    "You are a bank vendor-onboarding operations agent. Execute routine work through "
+    "execute_safe_vendor_work, which also runs the deterministic regulatory evidence "
+    "check, then inspect get_authority_cut and surface only ready human decisions. "
+    "Human approvals/revocations arrive outside your tool set. After the external "
+    "principal acts, call execute_authorized_vendor_work. Never treat model confidence "
+    "as authority and never claim that you approved, revoked, or bypassed a decision."
 )
 
 

@@ -1,24 +1,18 @@
-# Authority Cut - Reversible Autonomy with Strands Agents
+# Authority Cut — Human-controlled vendor onboarding for bank AI agents
 
-**One-line pitch:** A professional agent completes routine work autonomously, exposes only the smallest policy-valid semantic human authorities for protected effects, and propagates later human correction through already-executed reversible descendants without erasing unrelated safe work.
+**A bank lets an AI onboard a vendor. The AI does the routine work. A human approves the risky decision. If the evidence changes, affected work is undone and payment stays blocked.**
 
-## Submission readiness - READY
+Authority Cut is a working Strands agent for bank third-party risk, vendor-risk, compliance, procurement, and operational-risk teams. It handles routine onboarding work autonomously, but decisions with real compliance or financial consequences stay with a human. A narrow **BANK-ECP** evidence gate makes the regulatory evidence load-bearing: when the evidence supports the vendor-risk premise, the decision can be presented to the reviewer; when that evidence later changes from `PASS` to `HOLD`, the old approval becomes stale.
 
-Authority Cut is the AWS Agents for Humans / Professional Agents submission candidate.
+The visible result is the product: protected vendor setup that depended on the stale approval is undone, unrelated routine work remains intact, and the irreversible first payment cannot proceed.
 
-Verified evidence includes:
+## What a judge sees
 
-- authentic Strands Agents SDK orchestration;
-- real model-callable tool execution;
-- one deep vendor-onboarding professional workflow;
-- policy-bounded semantic Authority Cut computation;
-- external-human-only grant/revocation boundary;
-- correction propagation through an action DAG;
-- reversible compensation;
-- separately gated irreversible first-funds action;
-- public CI and public live judge surface;
-- verified Amazon Bedrock AgentCore Runtime deployment and live invocation;
-- **verified native Amazon Bedrock / Amazon Nova Lite foundation-model-backed Strands execution**.
+1. The AI completes five routine vendor-onboarding actions without interrupting the bank employee.
+2. BANK-ECP-style evidence evaluation returns `PASS`, and the human receives the vendor-risk decision.
+3. The human approves; vendor activation, ERP/purchasing setup, and payment-profile preparation proceed.
+4. The evidence is corrected and the gate becomes `HOLD`.
+5. Six affected reversible protected actions are rolled back, five unrelated safe actions remain executed, and first funds stays blocked from execution.
 
 Public judge URL:
 
@@ -28,58 +22,88 @@ Public repository:
 
 `https://github.com/evidencebound/evidencebound-authority-cut`
 
-## Competition contribution
+## Why this matters
 
-Authority Cut does **not** claim to invent HITL, approval workflows, interrupt/resume, revocable grants, dependency invalidation or compensation generally.
+Approval workflows usually answer a point-in-time question: *did a person approve this?* Autonomous agents create a harder problem: *does that approval still authorize work after the evidence underneath it changes?*
 
-The competition thesis is narrower:
+Authority Cut makes a human correction operational instead of merely conversational. The system can invalidate stale authority, unwind only the affected reversible work, preserve unrelated valid work, and keep an irreversible financial action from executing under stale approval.
 
-1. protected workflow effects declare semantic authority atoms;
-2. policy defines valid semantic decision bundles;
-3. the control plane computes the smallest currently actionable policy-valid bundle cover;
-4. prerequisite receipts determine when a decision is actually ready;
-5. human authority remains outside the model-callable Strands tool surface;
-6. later revocation propagates through downstream execution;
-7. already-executed reversible descendants are compensated while unrelated safe work is preserved;
-8. a pending irreversible descendant is invalidated rather than falsely described as rolled back.
+The public banking workflow is synthetic and safe for judging; it does not create external vendor records or move real funds.
 
-Observable fixed-workflow hook:
+## BANK-ECP → Authority Cut
+
+The public integration is intentionally narrow rather than embedding the private BANK-ECP benchmark runtime.
 
 ```text
-7 protected effects
--> 3 semantic human authorities
--> 6 reversible descendants compensated after correction
--> 5 unrelated safe actions preserved
--> irreversible transmit INVALIDATED
+Authoritative regulatory evidence
+        ↓
+Sanitized BANK-ECP evidence gate
+        ↓
+PASS / HOLD + reasons
+        ↓
+Human vendor-risk decision
+        ↓
+Strands agent executes only recorded authority
+        ↓
+Evidence changes: PASS → HOLD
+        ↓
+Stale authority invalidated
+        ↓
+Affected reversible work undone
+Safe work preserved
+First payment blocked from execution
 ```
+
+The public bridge uses a development-only DORA third-party-risk fixture with source locator **Regulation (EU) 2022/2554, Article 28(1)(a)**. It is explicitly `DEVELOPMENT_ONLY` and `NOT_FORMAL_BENCHMARK_EVIDENCE`; **no model-performance result is claimed**. See `docs/bank-ecp-bridge.md`.
+
+Model confidence never creates human authority.
 
 ## Real Strands execution
 
-The model-callable Strands tools are exactly:
+The public judge path executes a real Strands SDK `Agent` loop. The model-callable tools remain exactly:
 
 1. `execute_safe_vendor_work`
 2. `get_authority_cut`
 3. `execute_authorized_vendor_work`
 
-Approve and revoke are deliberately absent from the published model tool schema.
+There is no approve or revoke tool in the published Strands tool schema. Evidence correction is also not a model-callable authority-mutation tool. Human grant/revocation remains an external principal action recorded in the shared `ControlPlane`.
 
-The canonical public proof executes a real Strands `Agent` loop with a deterministic custom Strands `Model` provider so the judge path is reproducible and credential-free.
-
-Accepted public proof:
+The credential-free public proof uses a deterministic custom Strands `Model` provider so a judge can reproduce the complete tool loop without AWS credentials. Its current product sequence is:
 
 ```text
-execution = REAL_STRANDS_AGENT_LOOP_DETERMINISTIC_MODEL
-authority_mutation_tools = []
-authority_boundary = EXTERNAL_HUMAN_ONLY
-safe_actions_preserved = 5
-protected_reversible_effects_rolled_back = 6
-irreversible_transmit_after_correction = INVALIDATED
-receipt_count = 14
+routine vendor work + evidence PASS
+→ external human vendor-risk approval
+→ protected vendor setup
+→ external human payment-profile approval
+→ first-funds decision becomes ready but transmit remains blocked
+→ evidence changes PASS → HOLD
+→ stale vendor-risk authority invalidated
+→ 6 affected reversible protected effects ROLLED_BACK
+→ 5 unrelated safe actions remain EXECUTED
+→ irreversible transmit INVALIDATED / cannot execute under stale authority
 ```
 
-## Native Amazon Bedrock foundation-model acceptance - VERIFIED
+The public route intentionally does **not** claim a foundation-model or AgentCore invocation for that request.
 
-On 2026-09-01 a separate owner-authenticated AWS CloudShell acceptance executed the exact Authority Cut source commit:
+## Technical mechanism
+
+Under the human-facing product is the original Authority Cut mechanism. Protected effects declare policy requirements, policy defines valid **semantic authority** bundles, prerequisite receipts determine when a human decision is ready, and the control plane computes the currently actionable authority cut. A later human revocation or evidence invalidation propagates through the action graph and compensates reversible descendants without erasing unrelated safe work.
+
+The historical controlled workflow remains available as a separate evaluation surface:
+
+```text
+7 protected effects
+→ 3 semantic human authorities
+→ 6 reversible descendants rolled back after correction
+→ 5 unrelated safe actions preserved
+→ irreversible transmit INVALIDATED
+```
+
+That controlled `7 → 3` result is not presented as measured customer productivity.
+
+## Native Amazon Bedrock foundation-model acceptance — VERIFIED
+
+On **2026-09-01**, a separate owner-authenticated AWS CloudShell acceptance executed exact Authority Cut source commit:
 
 `9998565c6db8083446caef7e20a6cf03601533e6`
 
@@ -112,28 +136,28 @@ EXECUTION=REAL_STRANDS_AGENT_LOOP_FOUNDATION_MODEL
 FOUNDATION_MODEL_INVOCATION=PASS
 ```
 
-The fail-closed promotion gate requires three distinct model response SHA-256 receipts with positive token usage and all existing control/correction invariants before it can return PASS.
+The fail-closed promotion gate requires three distinct model-response SHA-256 receipts with positive token usage and all existing control/correction invariants before it can return PASS.
 
-This does **not** change the public Vercel proof into a paid-model route and does **not** retroactively make the historical AgentCore invocation foundation-model-backed.
+This historical acceptance does **not** turn the public Vercel proof into a paid-model route and does **not** retroactively make the historical AgentCore invocation foundation-model-backed.
 
 See `docs/bedrock-foundation-model-acceptance-2026-09-01.md`.
 
-## AgentCore Runtime - VERIFIED
+## Amazon Bedrock AgentCore Runtime — VERIFIED
 
-On 2026-08-23 Authority Cut was deployed to Amazon Bedrock AgentCore Runtime and invoked through the real AgentCore data plane.
+On **2026-08-23**, Authority Cut was deployed to Amazon Bedrock AgentCore Runtime and invoked through the real AgentCore data plane.
 
 Accepted configuration:
 
-- region: `eu-central-1` (Frankfurt)
-- Runtime name: `AuthorityCutRuntime`
-- Runtime version: `1`
-- status: `READY`
-- direct-code S3 CodeZip
-- runtime: `PYTHON_3_13`
-- entry point: `agentcore_main.py`
-- network mode: `PUBLIC`
-- packaged source HEAD: `200d71f963bb4496a6f01a6cf1788695b3164739`
-- CodeZip SHA-256: `67c9ce7de97f48970d3c595e6914fef314011fa5cebccf4f01cd4b6bea32690e`
+- region: `eu-central-1` (Frankfurt);
+- Runtime name: `AuthorityCutRuntime`;
+- Runtime version: `1`;
+- status: `READY`;
+- direct-code S3 CodeZip;
+- runtime: `PYTHON_3_13`;
+- entry point: `agentcore_main.py`;
+- network mode: `PUBLIC`;
+- packaged source HEAD: `200d71f963bb4496a6f01a6cf1788695b3164739`;
+- CodeZip SHA-256: `67c9ce7de97f48970d3c595e6914fef314011fa5cebccf4f01cd4b6bea32690e`.
 
 A real `InvokeAgentRuntime` call returned HTTP 200 and passed:
 
@@ -148,25 +172,25 @@ IRREVERSIBLE_TRANSMIT=INVALIDATED
 FOUNDATION_MODEL_INVOCATION=UNVERIFIED
 ```
 
-That historical AgentCore Runtime used the deterministic custom Strands provider. Its recorded foundation-model status remains historically correct. The later native Bedrock acceptance is a distinct execution path.
+That historical AgentCore Runtime used the deterministic custom Strands provider. Its recorded foundation-model status remains historically correct. The later 2026-09-01 native Bedrock acceptance is a distinct execution path.
 
 See `docs/agentcore-acceptance-2026-08-23.md`.
 
-## Fixed-workflow evaluation
+## Controlled evaluation boundary
 
-Controlled results:
+The original fixed vendor-onboarding workflow records:
 
 - safe actions before human attention: **5**;
 - protected effects: **7**;
 - one-approval-per-protected-effect baseline: **7** decisions;
-- Authority Cut semantic decisions: **3**;
-- decision reduction in this fixed workflow: **57.14%**;
+- semantic Authority Cut decisions: **3**;
+- decision reduction in that fixed workflow: **57.14%**;
 - executed reversible protected effects before correction: **6**;
 - reversible protected effects rolled back after correction: **6/6**;
 - irreversible effects executed without `funds_release`: **0**;
 - unrelated safe actions preserved: **5**.
 
-The 57.14% result is scoped only to this controlled workflow. No generalized customer productivity claim is made.
+The 57.14% value is scoped only to this controlled workflow. No generalized customer productivity, ROI, adoption, or field-study claim is made.
 
 ## Public judge path
 
@@ -174,9 +198,9 @@ Open:
 
 `https://evidencebound-authority-cut.vercel.app`
 
-Select **Run live Strands judge path**.
+Select **Run the end-to-end banking scenario**.
 
-The page runs a reset-each-call synthetic vendor-onboarding workflow and displays the real execution ledger. Machine-readable surfaces include:
+The service executes a reset-each-call synthetic vendor-onboarding workflow and returns the real execution ledger; it is not a saved replay. Machine-readable surfaces include:
 
 - `/health`
 - `/api/tool-boundary`
@@ -184,9 +208,11 @@ The page runs a reset-each-call synthetic vendor-onboarding workflow and display
 - `POST /api/strands-proof`
 - `/api/strands-proof-get`
 
-The public demo intentionally creates no external vendor or payment effects and intentionally remains credential-free.
+The public demo intentionally creates no external vendor or payment effects and remains credential-free.
 
 ## Reproduce locally
+
+Deterministic kernel:
 
 ```bash
 python -m pip install -e '.[dev]' --no-build-isolation
@@ -241,30 +267,35 @@ Verified AWS acceptances used independently authenticated AWS CloudShell paths; 
 
 ## New-project / pre-existing-work disclosure
 
-This dedicated repository and its vendor-onboarding graph, Authority Cut mechanism, Strands orchestration, evaluation, AgentCore adapter and judge surface were authored during the competition period.
+This dedicated repository and its vendor-onboarding graph, Authority Cut mechanism, Strands orchestration, evaluation, AgentCore adapter, and judge surface were authored during the competition period.
 
-Pre-existing EvidenceBound concepts disclosed for completeness include provenance/evidence binding, dependency graphs, fail-closed verification, selective invalidation/recovery and proof receipts.
+Pre-existing EvidenceBound concepts disclosed for completeness include provenance/evidence binding, dependency graphs, fail-closed verification, selective invalidation/recovery, and proof receipts.
 
-No source file from EvidenceBound Core, Recovery Mesh, Verified Memory, DataHub Gate or SignalReview was copied into this project.
+The BANK-ECP bridge added for the banking product is a sanitized public integration artifact. It does not copy the private benchmark runtime or expose sealed-holdout/private benchmark construction artifacts.
 
-See `docs/preexisting-work.md` and `docs/repository-provenance.md`.
+No source file from EvidenceBound Core, Recovery Mesh, Verified Memory, DataHub Gate, or SignalReview was copied into this project.
+
+See `docs/preexisting-work.md`, `docs/repository-provenance.md`, and `docs/bank-ecp-bridge.md`.
 
 ## Limitations
 
 Authority Cut does not prove:
 
 - correctness of arbitrary enterprise policy;
-- legal authorization;
+- legal authorization or regulatory compliance certification;
+- correctness of every regulatory interpretation;
 - authenticated end-user principal identity;
 - safe compensation in arbitrary external systems;
 - durable distributed authority state;
-- general corrigibility, alignment or autonomous-agent safety;
-- generalized productivity improvement.
+- general corrigibility, alignment, or autonomous-agent safety;
+- generalized productivity improvement;
+- BANK-ECP model superiority or formal holdout performance.
 
-Minimality is exact only over the policy-defined semantic decision bundles supplied to the runtime.
+Minimality is exact only over the policy-defined semantic decision bundles supplied to the runtime. The public banking workflow uses synthetic in-memory/reference effects for safe judging.
 
 ## Evidence pack
 
+- `docs/bank-ecp-bridge.md`
 - `docs/prior-art.md`
 - `docs/claims-ledger.md`
 - `docs/bedrock-foundation-model-acceptance-2026-09-01.md`

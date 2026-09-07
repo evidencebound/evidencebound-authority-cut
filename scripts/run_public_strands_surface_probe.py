@@ -24,6 +24,9 @@ assert p['authority_mutation_tools'] == []
 assert p['safe_actions_preserved'] == 5
 assert p['protected_reversible_effects_rolled_back'] == 6
 assert p['irreversible_transmit_after_correction'] == 'INVALIDATED'
+assert p['correction_trigger'] == 'BANK_ECP_EVIDENCE_CHANGE'
+assert p['bank_ecp_evidence_after_correction']['verdict'] == 'HOLD'
+assert 'MATERIAL_CITATION_MISMATCH' in p['bank_ecp_evidence_after_correction']['reasons']
 assert p['foundation_model_invocation'] == 'UNVERIFIED'
 assert p['agentcore'] == 'UNVERIFIED'
 assert len(p['phases']) == 4

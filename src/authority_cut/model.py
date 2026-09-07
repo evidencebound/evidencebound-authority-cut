@@ -11,6 +11,7 @@ def digest(v: Any) -> str:
 
 class Risk(str,Enum): SAFE="SAFE"; HUMAN="HUMAN"; HIGH="HIGH"
 class Status(str,Enum): PENDING="PENDING"; EXECUTED="EXECUTED"; BLOCKED="BLOCKED"; INVALIDATED="INVALIDATED"; ROLLED_BACK="ROLLED_BACK"
+class EvidenceVerdict(str,Enum): PASS="PASS"; HOLD="HOLD"; ABSTAIN="ABSTAIN"
 
 @dataclass(frozen=True,slots=True)
 class Action:
@@ -21,14 +22,20 @@ class Action:
 @dataclass(frozen=True,slots=True)
 class DecisionBundle:
     bundle_id:str; grants:frozenset[str]; question:str; evidence:tuple[str,...]
-    prereqs:tuple[str,...]=()
+    prereqs:tuple[str,...]=(); evidence_gate:str|None=None
 
 @dataclass(frozen=True,slots=True)
 class HumanDecision:
     bundle_id:str; grants:frozenset[str]; approved:bool; binding:str; rationale:str
 
+@dataclass(frozen=True,slots=True)
+class EvidenceDecision:
+    gate_id:str; case_id:str; verdict:EvidenceVerdict; reasons:tuple[str,...]
+    source_locator:str; evidence_class:str; digest:str
+
 @dataclass(slots=True)
 class RuntimeState:
     status:dict[str,Status]=field(default_factory=dict)
     decisions:dict[str,HumanDecision]=field(default_factory=dict)
+    evidence:dict[str,EvidenceDecision]=field(default_factory=dict)
     receipts:list[dict[str,Any]]=field(default_factory=list)

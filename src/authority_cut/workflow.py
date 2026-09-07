@@ -1,9 +1,10 @@
 from __future__ import annotations
+from .bank_ecp_bridge import GATE_ID
 from .graph import ActionGraph
 from .model import Action, DecisionBundle, Risk
 
 
-def vendor_onboarding_graph() -> ActionGraph:
+def _vendor_onboarding_graph(*, evidence_gate: str | None) -> ActionGraph:
     actions = [
         Action('collect', 'collect_vendor_record'),
         Action('tax_check', 'validate_tax_id', ('collect',)),
@@ -19,8 +20,25 @@ def vendor_onboarding_graph() -> ActionGraph:
         Action('transmit','transmit_first_payment',('remittance',),Risk.HIGH,frozenset({'funds_release'}),False),
     ]
     bundles = [
-        DecisionBundle('vendor-risk',frozenset({'vendor_exception','bank_change'}),'Approve the reviewed vendor identity/tax exception and new bank account?',('tax-check-42','bank-check-42'),('tax_check','bank_check')),
+        DecisionBundle(
+            'vendor-risk',
+            frozenset({'vendor_exception','bank_change'}),
+            'Approve vendor activation after reviewing the bank and compliance evidence?',
+            ('tax-check-42','bank-check-42'),
+            ('tax_check','bank_check'),
+            evidence_gate,
+        ),
         DecisionBundle('payment-release',frozenset({'payment_enable'}),'Enable the vendor payment profile and terms?',('draft-vendor-record','bank-check-42'),('activate',)),
         DecisionBundle('first-funds',frozenset({'funds_release'}),'Release the first irreversible payment transmission?',('payment-profile-42','remittance-preview-42'),('remittance',)),
     ]
     return ActionGraph(actions,bundles)
+
+
+def vendor_onboarding_graph() -> ActionGraph:
+    """Historical controlled workflow used by the original Authority Cut evaluation."""
+    return _vendor_onboarding_graph(evidence_gate=None)
+
+
+def bank_vendor_onboarding_graph() -> ActionGraph:
+    """Prize-facing banking workflow with a load-bearing BANK-ECP evidence gate."""
+    return _vendor_onboarding_graph(evidence_gate=GATE_ID)
