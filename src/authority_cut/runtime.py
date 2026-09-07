@@ -10,7 +10,7 @@ from threading import RLock
 
 from .engine import ControlPlane
 from .tools import VendorTools
-from .workflow import vendor_onboarding_graph
+from .workflow import bank_vendor_onboarding_graph
 
 _LOCK=RLock()
 _PLANE: ControlPlane | None=None
@@ -20,5 +20,5 @@ def get_plane(*, reset: bool=False) -> ControlPlane:
     global _PLANE
     with _LOCK:
         if reset or _PLANE is None:
-            _PLANE=ControlPlane(vendor_onboarding_graph(),VendorTools.memory())
+            _PLANE=ControlPlane(bank_vendor_onboarding_graph(),VendorTools.memory())
         return _PLANE
