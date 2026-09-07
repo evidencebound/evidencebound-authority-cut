@@ -22,7 +22,7 @@ class Action:
 @dataclass(frozen=True,slots=True)
 class DecisionBundle:
     bundle_id:str; grants:frozenset[str]; question:str; evidence:tuple[str,...]
-    prereqs:tuple[str,...]=()
+    prereqs:tuple[str,...]=(); evidence_gate:str|None=None
 
 @dataclass(frozen=True,slots=True)
 class HumanDecision:
@@ -37,4 +37,5 @@ class EvidenceDecision:
 class RuntimeState:
     status:dict[str,Status]=field(default_factory=dict)
     decisions:dict[str,HumanDecision]=field(default_factory=dict)
+    evidence:dict[str,EvidenceDecision]=field(default_factory=dict)
     receipts:list[dict[str,Any]]=field(default_factory=list)
