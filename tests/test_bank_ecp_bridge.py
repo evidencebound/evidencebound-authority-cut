@@ -4,11 +4,11 @@ from authority_cut.bank_ecp_bridge import evaluate_bank_ecp_bridge
 from authority_cut.engine import ControlPlane
 from authority_cut.model import EvidenceVerdict, Status
 from authority_cut.tools import VendorTools
-from authority_cut.workflow import vendor_onboarding_graph
+from authority_cut.workflow import bank_vendor_onboarding_graph
 
 
 def make() -> ControlPlane:
-    return ControlPlane(vendor_onboarding_graph(), VendorTools.memory())
+    return ControlPlane(bank_vendor_onboarding_graph(), VendorTools.memory())
 
 
 def test_supported_dora_vendor_responsibility_is_pass():
