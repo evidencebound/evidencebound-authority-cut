@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
+from .bank_ecp_bridge import evaluate_bank_ecp_bridge
 from .engine import ControlPlane
 from .evaluate import run_evaluation
 from .runtime import get_plane
@@ -21,6 +22,18 @@ def snapshot(p: ControlPlane) -> dict:
     return {
         "status": {k: v.value for k, v in p.state.status.items()},
         "decision_surface": p.decision_surface(),
+        "evidence": {
+            bundle_id: {
+                "gate_id": d.gate_id,
+                "case_id": d.case_id,
+                "verdict": d.verdict.value,
+                "reasons": list(d.reasons),
+                "source_locator": d.source_locator,
+                "evidence_class": d.evidence_class,
+                "digest": d.digest,
+            }
+            for bundle_id, d in p.state.evidence.items()
+        },
         "receipts": p.state.receipts,
     }
 
@@ -59,6 +72,11 @@ def reset() -> dict:
 def run_safe() -> dict:
     p = plane()
     p.execute_autonomous()
+    if "vendor-risk" not in p.state.evidence:
+        p.apply_evidence(
+            "vendor-risk",
+            evaluate_bank_ecp_bridge("DORA_VENDOR_RESPONSIBILITY_SUPPORTED"),
+        )
     return snapshot(p)
 
 
