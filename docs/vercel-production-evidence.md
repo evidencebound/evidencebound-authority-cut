@@ -19,9 +19,7 @@ The deployment uses a small Vercel entry bundle whose `pyproject.toml` installs 
 
 ## Human-facing acceptance
 
-The production root returns HTTP 200 and opens with the banking product story:
-
-> A bank AI handles routine vendor work. A human approves consequential risk. If the supporting evidence changes, affected work is undone and payment stays blocked.
+The production root returns HTTP 200. Verified first-screen copy includes the hero **“Onboard a vendor without giving the AI the final say.”** The lede explains that the AI handles routine vendor work, a person approves decisions with real compliance or financial risk, and changed evidence causes affected work to be undone while payment stays blocked.
 
 The first screen exposes the end-to-end banking scenario before technical diagnostics. The technical section explicitly labels the BANK-ECP bridge `DEVELOPMENT_ONLY` and does not claim that the public request invokes a foundation model or AgentCore.
 
@@ -112,7 +110,7 @@ The release bundle contains two files:
 1. `vercel_main.py`, which exposes the public FastAPI app and GET acceptance alias;
 2. deployment `pyproject.toml`, which pins the exact Git source commit and `strands-agents==1.52.0`, and declares `[tool.vercel] entrypoint = "vercel_main:app"`.
 
-The production build used Vercel CLI 59.11.7, Python 3.12 and uv 0.10.11, installed dependencies from the deployment `pyproject.toml`, compiled Python bytecode, and completed successfully before alias promotion.
+The production build used Vercel CLI 59.11.7, Python 3.12 and uv 0.10.11, installed dependencies from the deployment `pyproject.toml`, compiled Python bytecode, and completed successfully before the canonical alias was observed on the READY deployment.
 
 The previously accepted production deployment `dpl_8b5jXwdhD57u2b4XfvWNRJSLsrey` remains preserved as a rollback candidate.
 
